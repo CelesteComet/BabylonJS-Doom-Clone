@@ -3,15 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "dependencies": {
-    "babel": "^6.23.0",
-    "babel-loader": "^8.0.0-beta.0",
-    "babylonjs": "^3.1.0-alpha3.7",
-    "express": "^4.16.2",
-    "path": "^0.12.7",
-    "webpack": "^3.8.1"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack && node server.js",
@@ -26,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/CelesteComet/BabylonJS-Doom-Clone/issues"
   },
-  "homepage": "https://github.com/CelesteComet/BabylonJS-Doom-Clone#readme"
+  "homepage": "https://github.com/CelesteComet/BabylonJS-Doom-Clone#readme",
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.31",
+    "@babel/preset-env": "^7.0.0-beta.31",
+    "babel-loader": "^8.0.0-beta.0",
+    "babylonjs": "^3.1.0-alpha3.7",
+    "express": "^4.16.2",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  }
 }
