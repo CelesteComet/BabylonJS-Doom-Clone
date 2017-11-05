@@ -1,16 +1,43 @@
 import * as BABYLON from 'babylonjs';
 import { scene, camera } from './globals';
 import Utils from './utils';
+import MonsterManager from './MonsterManager';
+
 
 const MapManager = {
   init: function(assets) {
     this.materials = assets.materials;
     this.list = {};
     this.active = false;
-    this.run();
-    this.stop();
+    window.addEventListener('keydown', function(e) {
+      if(e.keyCode == 187) { 
+        if(!this.active) {
+          this.run(); 
+        } else {
+          this.stop();
+        }
+      }
+    }.bind(this))
+
+
   },
   run: function() {
+    window.addEventListener('click', function(e) {
+      var mesh = this.create();
+      mesh.position = this.guideBox.position;
+    }.bind(this))
+
+    window.addEventListener('keydown', function(e) {
+      var self = this; 
+      console.log(e.keyCode);
+      if(e.keyCode == 219) {
+        this.guideBox.scaling.y += 0.5;
+      } // +
+      if(e.keyCode == 191) {
+        var m = MonsterManager.create();
+        m.position = this.guideBox.position;
+      } //?)
+    }.bind(this))
     this.active = true;
     this.guideBox = BABYLON.MeshBuilder.CreateBox('pointerPlane', {height: 1, width: 1, depth: 1}, scene);
     this.guideBox.isPickable = false;
@@ -41,6 +68,13 @@ const MapManager = {
       var z = Utils.getNearestRound(pos.z, 0.5);
       this.guideBox.position = new BABYLON.Vector3(x, y, z);
     }
+  },
+  create: function() {
+    var id = Math.random();
+    var width = this.guideBox.scaling.x;
+    var height = this.guideBox.scaling.y;
+    var depth = this.guideBox.scaling.z;
+    return BABYLON.MeshBuilder.CreateBox(`${id}`, {height: height, width: width, depth: depth}, scene);
   }
 }
 
