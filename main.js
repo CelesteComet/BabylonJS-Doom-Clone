@@ -1,5 +1,5 @@
-var debug = false; 
-var moveUnits = true;
+var debug = true; 
+var moveUnits = false;
 var noFire = false;
 var music = true;
 if(debug) {
@@ -10,9 +10,10 @@ if(debug) {
 
 
 import * as BABYLON from 'babylonjs';
-import { scene, engine, canvas } from './globals';
+import { scene, engine, canvas, camera, cambox } from './globals';
 import Sounds from './sounds.js';
 import Materials from './materials.js';
+import ProjectileManager from './ProjectileManager.js';
 
 
 // load the sounds
@@ -56,13 +57,8 @@ Materials.shotgunMaterial.diffuseTexture = shotgunTexture;
   //e();
 //}
 
-// create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-var cambox = BABYLON.MeshBuilder.CreateBox('cam', {height: 0.8, width: 1, depth: 1}, scene);
-cambox.isPickable = false;
-var camera = new BABYLON.UniversalCamera('camera1', new BABYLON.Vector3(0, 2, -2), scene);
-camera.applyGravity = true;
-camera.checkCollisions = true;
-camera.ellipsoid = new BABYLON.Vector3(0.1, 1.5, 0.2);
+
+
 
 canvas.addEventListener('click', function() {
   canvas.requestPointerLock();
@@ -70,75 +66,12 @@ canvas.addEventListener('click', function() {
 
 
 var SpriteManagerImp = new BABYLON.SpriteManager("SpriteManagerImp", "sprites/imp.png", 100, 64, scene);
-var SpriteManagerFireball = new BABYLON.SpriteManager("SpriteManagerFireball", "sprites/fireballs.png", 20000 , 15, scene);
 
 
 
 
-var ProjectileManager = function() {
-  this.list = {};
 
-  this.create = function() {
-    // ID stuff
-    var o = {};
-    o.id = Math.random();
 
-    // movement stuff
-    o.speed = 0.4;
-    o.vX = 0;
-    o.vY = 0;
-    o.vZ = 0;
-
-    // hitbox stuff 
-    
-    o.hitboxHeight = 0.5;
-    o.hitboxDepth = 0.1;
-    o.hitboxWidth = 0.5;
-    o.hitbox = BABYLON.MeshBuilder.CreateBox('fireball', {height: o.hitboxHeight, width: o.hitboxWidth, depth: o.hitboxDepth}, scene);
-    o.hitbox.id = o.id;
-    o.hitbox.material = new BABYLON.StandardMaterial("wireframeMaterial", scene);
-    if(debug) {
-      o.hitbox.material.wireframe = true;
-    } else {
-      o.hitbox.material.alpha = 0;
-    }
-    o.hitbox.rotation = camera.rotation;
-    o.hitbox.checkCollisions = true;
-    o.hitbox.isPickable = false;
-
-    // sprite stuff
-    o.sprite = new BABYLON.Sprite("fireball", SpriteManagerFireball);
-    o.sprite.playAnimation(0, 1, true, 100);
-    
-
-    o.update = function() {
-      if(o.hitbox.intersectsMesh(cambox)) {
-        o.hitbox.dispose();
-        o.sprite.dispose();
-        if(!debug) {
-          Sounds.doomGuyInPain.play();
-        }
-        delete ProjectileManager.list[o.id]
-      }
-      o.hitbox.position.x += o.vX;
-      o.hitbox.position.y += o.vY;
-      o.hitbox.position.z += o.vZ;
-      o.sprite.position = o.hitbox.position;
-    }
-
-    // add to list and return
-    this.list[o.id] = o;
-    return o;
-  }
-
-  this.update = function() {
-    for(var id in this.list) {
-      this.list[id].update();
-    }
-  }
-}
-
-var ProjectileManager = new ProjectileManager();
 
 var MonsterManager = function() {
   this.list = {};
