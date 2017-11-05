@@ -8,6 +8,7 @@ const ProjectileManager = new (function() {
   this.list = {};
 
   this.create = function() {
+
     // ID stuff
     var o = {};
     o.id = Math.random();
@@ -19,7 +20,6 @@ const ProjectileManager = new (function() {
     o.vZ = 0;
 
     // hitbox stuff 
-    
     o.hitboxHeight = 0.5;
     o.hitboxDepth = 0.1;
     o.hitboxWidth = 0.5;
@@ -39,8 +39,14 @@ const ProjectileManager = new (function() {
     o.sprite = new BABYLON.Sprite("fireball", SpriteManagerFireball);
     o.sprite.playAnimation(0, 1, true, 100);
     
+    // play a sound on creation
+    var sound = Sounds.fireball;
+    sound.setVolume(0.3);
+    sound.play();
+    
 
     o.update = function() {
+
       if(o.hitbox.intersectsMesh(cambox)) {
         o.hitbox.dispose();
         o.sprite.dispose();

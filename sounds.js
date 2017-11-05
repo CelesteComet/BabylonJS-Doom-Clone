@@ -7,11 +7,14 @@ const Sounds = {};
 const soundFileNames = {
   'shotgunBlast': 'shotgunBlast.wav',
   'pain': 'pain.wav',
-  'doomGuyInPain': 'doomguyinpain.wav'
+  'doomGuyInPain': 'doomguyinpain.wav',
+  'fireball': 'fireball.wav'
 }
 
 for(let name in soundFileNames) {
   Sounds[name] = new BABYLON.Sound(name, `sounds/${soundFileNames[name]}`, scene);
 }  
+
+
 
 export default Sounds;

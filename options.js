@@ -1,6 +1,6 @@
 const opts = {
   verbose: true,
-  debug: true
+  debug: true 
 };
 
 export default opts;
