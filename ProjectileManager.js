@@ -3,6 +3,7 @@ import { scene, debug, camera, cambox } from './globals';
 import Sounds from './sounds';
 
 var SpriteManagerFireball = new BABYLON.SpriteManager("SpriteManagerFireball", "sprites/fireballs.png", 20000 , 15, scene);
+
 const ProjectileManager = new (function() {
   this.list = {};
 

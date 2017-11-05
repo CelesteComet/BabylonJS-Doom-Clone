@@ -1,5 +1,7 @@
 import * as BABYLON from 'babylonjs';
-import { scene } from './globals';
+import { scene, assetsManager } from './globals';
+import opts from './options';
+const { verbose } = opts;
 
 const Materials = {};
 
@@ -9,13 +11,25 @@ const textures = {
   'woodenCrate': { type: 'diffuse', fileName: 'woodenCrate.jpg' }
 };
 
+const numberOfTextures = Object.keys(textures).length;
+let loadedTextures = 0;
+
 for(let textureName in textures) {
-  Materials[textureName] = new BABYLON.StandardMaterial(textureName, scene);
-  Materials[textureName][textures[textureName].type + 'Texture'] = new BABYLON.Texture('textures/' + textures[textureName].fileName);
+  if(verbose) { console.log(`loading ${textureName}`) }
+  var imageTask = assetsManager.addImageTask(textureName, 'textures/' + textures[textureName].fileName);
+  imageTask.onSuccess = function(task) {
+    if(verbose) { console.log(`loaded ${textureName}`); }
+    loadedTextures++;
+    Materials[textureName] = new BABYLON.StandardMaterial(textureName, scene);
+    Materials[textureName][textures[textureName].type + 'Texture'] = new BABYLON.Texture('textures/' + textures[textureName].fileName);
+    if(loadedTextures == numberOfTextures) {
+      Materials.bulletHoleMaterial.diffuseTexture.hasAlpha = true; 
+      Materials.bulletHoleMaterial.zOffset = -2;
+    }
+  }
 };
 
-Materials.bulletHoleMaterial.diffuseTexture.hasAlpha = true; 
-Materials.bulletHoleMaterial.zOffset = -2;
+
 
 export default Materials;
 

@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { scene } from './globals';
+import { scene, assetsManager } from './globals';
 
 const Sounds = {};
 

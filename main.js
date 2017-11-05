@@ -11,10 +11,11 @@ if(debug) {
 
 import * as BABYLON from 'babylonjs';
 import { scene, engine, canvas, camera, cambox } from './globals';
-import Sounds from './sounds.js';
-import Materials from './materials.js';
-import ProjectileManager from './ProjectileManager.js';
-
+import Utils from './utils';
+import Sounds from './sounds';
+import Materials from './materials';
+import ProjectileManager from './ProjectileManager';
+import MonsterManager from './MonsterManager';
 
 // load the sounds
 
@@ -65,7 +66,6 @@ canvas.addEventListener('click', function() {
 })
 
 
-var SpriteManagerImp = new BABYLON.SpriteManager("SpriteManagerImp", "sprites/imp.png", 100, 64, scene);
 
 
 
@@ -73,91 +73,8 @@ var SpriteManagerImp = new BABYLON.SpriteManager("SpriteManagerImp", "sprites/im
 
 
 
-var MonsterManager = function() {
-  this.list = {};
 
-  this.create = function() {
-    // ID stuff
-    var o = {};
-    o.id = Math.random();
 
-    // property stuff
-    o.dead = false;
-    o.fire = function() {
-      var fireball = ProjectileManager.create();
-      fireball.hitbox.position = o.hitbox.position.clone();
-      // Get player vector3
-      var direction = camera.position.subtract(o.hitbox.position).normalize();
-      fireball.vX = direction.x * fireball.speed;
-      fireball.vY = direction.y * fireball.speed;
-      fireball.vZ = direction.z * fireball.speed;
-    }
-
-    // Movement stuff
-    o.tick = 0;
-    o.vX = 0;
-    o.vY = 0;
-    o.vZ = 0;
-
-    // Hitbox stuff
-    o.hitboxHeight = 1.8;
-    o.hitboxDepth = 2;
-    o.hitboxWidth = 1;
-    o.hitbox = BABYLON.MeshBuilder.CreateBox('imp', {height: o.hitboxHeight, width: o.hitboxWidth, depth: o.hitboxDepth}, scene);
-    o.hitbox.id = o.id;
-    o.hitbox.material = new BABYLON.StandardMaterial("wireframeMaterial", scene);
-    if(debug) {
-      o.hitbox.material.wireframe = true;
-    } else {
-      o.hitbox.material.alpha = 0;
-    }
-    o.hitbox.rotation = camera.rotation;
-    o.hitbox.position.y += 1.5;
-
-    // Sprite stuff
-    o.sprite = new BABYLON.Sprite("imp", SpriteManagerImp);
-    o.sprite.size = 3.1;
-    o.sprite.position = o.hitbox.position;
-    o.sprite.playAnimation(0, 1, true, 300);
-
-    // Update
-    o.update = function() {
-      if(o.dead) {
-        o.vX = 0;
-        o.vZ = 0;
-        return;
-      }
-      o.tick++;
-      if(Math.random() < 0.01 && !o.dead) {
-        if(!noFire) {
-          o.fire();
-        }
-        o.vX = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
-        o.vZ = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
-      }
-      if(moveUnits) {
-        o.hitbox.position.x += o.vX;
-        o.hitbox.position.z += o.vZ;
-
-      }
-
-    }
-
-    // Add it to the list
-    this.list[o.id] = o
-    // and then return it
-    return o;
-  }
-
-  this.update = function() {
-    for(var id in this.list) {
-      this.list[id].update();
-    }
-  }
-  return this;
-}
-
-var MonsterManager = new MonsterManager();
 
   // create the user interface including the gun
   var gunMesh = BABYLON.MeshBuilder.CreatePlane('weapon', {width: 1}, scene);
@@ -182,20 +99,7 @@ var createScene = function(){
   
   
 
-  // target the camera to scene origin
-  camera.setTarget(BABYLON.Vector3.Zero());
 
-  // attach the camera to the canvas
-  camera.attachControl(canvas, true);
-
-  // give camera WASD movement
-  camera.keysUp.push(87);
-  camera.keysDown.push(83);
-  camera.keysLeft.push(65);
-  camera.keysRight.push(68);
-
-  // limit camera speed
-  camera.speed = 0.4;
 
   for(var i = 0; i < 10; i++) {
     var m = MonsterManager.create();
@@ -225,10 +129,7 @@ var createScene = function(){
 
 
 // play the badass music
-if(music) {
-  var e1m1music = new BABYLON.Sound("Music", "sounds/e1m1.mp3", scene, null, { loop: true, autoplay: !debug });
-}
-
+var e1m1music = new BABYLON.Sound("Music", "sounds/e1m1.mp3", scene, null, { loop: true, autoplay: true});
 createScene();
 
 // run the render loop
@@ -269,16 +170,17 @@ function updateShotgun() {
 }
 
 window.addEventListener("click", function(e) {
+  var pickInfo = Utils.getCameraRayCastPickInfo();
   if(canShoot) {
     Sounds.shotgunBlast.play();
     timer = 55;
-    var ray = new BABYLON.Ray(camera.globalPosition, camera.getTarget().subtract(camera.globalPosition).normalize());
-    console.log(camera.globalPosition, camera.getTarget().subtract(camera.globalPosition).normalize())
-    var pickInfo = scene.pickWithRay(ray);
+
     
     var decalSize = new BABYLON.Vector3(0.1, 0.1, 0.1);
     var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
+
     decal.material = Materials.bulletHoleMaterial;
+    
     if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
 
       // find the monster in the list, play the death animation, then dispose
