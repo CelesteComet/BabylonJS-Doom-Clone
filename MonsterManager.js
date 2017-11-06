@@ -3,6 +3,7 @@ import { scene, camera } from './globals';
 import ProjectileManager from './ProjectileManager';
 import Sounds from './sounds';
 import opts from './options';
+import MapManager from './MapManager';
 
 const { debug } = opts;
 /*
@@ -12,11 +13,20 @@ const { debug } = opts;
   testBox.position.z += 6;
   testBox.isPickable = true;
 */
+var ground;
+
 
 var MonsterManager = {
   init: function(assets) {
     this.materials = assets.materials;
     this.run();
+    console.log("Adding a beautiful floor");
+    ground = BABYLON.Mesh.CreateGround('ground1', 300, 300, 0, scene);
+    ground.material = new BABYLON.StandardMaterial('s', scene);
+    
+    ground.material = this.materials.woodenCrate;
+    ground.position.y -= 20;
+    ground.checkCollisions = true;
   },
   run: function() {
     var SpriteManagerImp = new BABYLON.SpriteManager("SpriteManagerImp", "sprites/impy.png", 100, 70, scene);
@@ -41,12 +51,12 @@ var MonsterManager = {
       // Movement stuff
       o.tick = 0;
       o.vX = 0;
-      o.vY = 0;
+      o.vY = -0.05;
       o.vZ = 0;
 
       // Hitbox stuff
-      o.hitboxHeight = 1.8;
-      o.hitboxDepth = 2;
+      o.hitboxHeight = 2.1;
+      o.hitboxDepth = 1;
       o.hitboxWidth = 1;
       o.hitbox = BABYLON.MeshBuilder.CreateBox('imp', {height: o.hitboxHeight, width: o.hitboxWidth, depth: o.hitboxDepth}, scene);
       o.hitbox.id = o.id;
@@ -61,8 +71,9 @@ var MonsterManager = {
 
       // Sprite stuff
       o.sprite = new BABYLON.Sprite("imp", SpriteManagerImp);
-      o.sprite.size = 3.1;
-      o.sprite.position = o.hitbox.position;
+      o.sprite.size = 2.8;
+      //o.sprite.position = o.hitbox.position;
+      //o.sprite.position.y += 100;
       o.sprite.playAnimation(0, 3, true, 300);
 
       // Sprite Actions
@@ -85,7 +96,6 @@ var MonsterManager = {
 
       o.stopMoving = function() {
         o.vX = 0;
-        o.vY = 0;
         o.vZ = 0;
       }
 
@@ -99,10 +109,18 @@ var MonsterManager = {
       // Update
       o.update = function() {
         o.tick++;
-        //if(o.hitbox.intersectsMesh(testBox)) {
-        //  o.vX = -o.vX;//Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
-        //  o.vZ = -o.vY;//Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
-        //}
+        for(let id in MapManager.list) {
+          if(o.hitbox.intersectsMesh(MapManager.list[id])) {
+            o.vX = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
+            o.vZ = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
+          }
+        }
+
+        if(o.hitbox.intersectsMesh(ground)) {
+          o.vY = 0;
+        }
+
+
         if(o.dead) {
           o.vX = 0;
           o.vZ = 0;
@@ -114,6 +132,7 @@ var MonsterManager = {
 
         o.hitbox.position.x += o.vX;
         o.hitbox.position.z += o.vZ;
+        o.hitbox.position.y += o.vY;
       }
 
       // Add it to the list

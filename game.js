@@ -24,9 +24,7 @@ var game = {
     console.log("Adding beautiful lights");
     var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
 
-    console.log("Adding a beautiful floor");
-    var ground = BABYLON.Mesh.CreateGround('ground1', 300, 300, 0, scene);
-    ground.checkCollisions = true;
+
 
 
 

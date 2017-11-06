@@ -5,6 +5,8 @@ import MonsterManager from './MonsterManager';
 
 
 const MapManager = {
+  scaling: ['x', 'y', 'z'],
+  scalingIndex: 0,
   init: function(assets) {
     this.materials = assets.materials;
     this.list = {};
@@ -22,21 +24,52 @@ const MapManager = {
 
   },
   run: function() {
+    camera.applyGravity = false;
+    this.deleteMode = false;
     window.addEventListener('click', function(e) {
-      var mesh = this.create();
-      mesh.position = this.guideBox.position;
+      if(this.active) {
+        if(this.deleteMode) {
+          var pickInfo = Utils.getCameraRayCastPickInfo();
+          if(pickInfo.pickedMesh) {
+            pickInfo.pickedMesh.dispose();
+          }
+        } else {
+          var mesh = this.create();
+          mesh.id = Math.random();
+          mesh.position = this.guideBox.position;
+          this.list[mesh.id] = mesh;
+        }
+      }
     }.bind(this))
 
-    window.addEventListener('keydown', function(e) {
+    window.addEventListener('keyup', function(e) {
       var self = this; 
-      console.log(e.keyCode);
       if(e.keyCode == 219) {
-        this.guideBox.scaling.y += 0.5;
+
+        this.guideBox.scaling[this.scaling[this.scalingIndex]] += 0.5;
       } // +
+
+      if(e.keyCode == 221) {
+        if(this.guideBox.scaling[this.scaling[this.scalingIndex]] > 0.5) {
+          this.guideBox.scaling[this.scaling[this.scalingIndex]] -= 0.5;
+        }
+      }
+
+      if(e.keyCode == 220) {
+        this.scalingIndex++;
+        if(this.scalingIndex >= this.scaling.length) {
+          this.scalingIndex = 0;
+        }
+      }
       if(e.keyCode == 191) {
         var m = MonsterManager.create();
-        m.position = this.guideBox.position;
+        m.hitbox.position = this.guideBox.position;
+        m.sprite.position = this.guideBox.position;
       } //?)
+
+      if(e.keyCode == 189) {
+        this.turnOnDeleteMode();
+      }
     }.bind(this))
     this.active = true;
     this.guideBox = BABYLON.MeshBuilder.CreateBox('pointerPlane', {height: 1, width: 1, depth: 1}, scene);
@@ -50,17 +83,19 @@ const MapManager = {
 
     
 
-    this.pointerPlane.mesh.position.z += 7;
+    this.pointerPlane.mesh.position.z += 14;
     this.pointerPlane.mesh.material = this.materials.wireFrame.clone();
-    this.pointerPlane.mesh.material.alpha = 0;
+    //this.pointerPlane.mesh.material.alpha = 0;
     this.pointerPlane.mesh.parent = camera;
   },
   stop: function() {
+    camera.applyGravity = true;
     this.active = false;
     this.guideBox.dispose();
     this.pointerPlane.mesh.dispose();
   },
   update: function() {  
+
     if(this.active && Utils.getCameraRayCastPosition()) {
       var pos = Utils.getCameraRayCastPosition();
       var x = Utils.getNearestRound(pos.x, 0.5);
@@ -75,6 +110,11 @@ const MapManager = {
     var height = this.guideBox.scaling.y;
     var depth = this.guideBox.scaling.z;
     return BABYLON.MeshBuilder.CreateBox(`${id}`, {height: height, width: width, depth: depth}, scene);
+  },
+  turnOnDeleteMode: function() {
+    this.deleteMode = true;
+    this.pointerPlane.mesh.dispose();
+    this.pointerPlane = null;
   }
 }
 

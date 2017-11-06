@@ -10,7 +10,6 @@ const { debug } = opts;
 
 var WeaponsManager = {
   weapons: {},
-  currentWeapon: null,
   init: function(assets) {
     this.materials = assets.materials;
     this.run();
@@ -19,9 +18,11 @@ var WeaponsManager = {
     this.weapons['shotgun'] = this.initShotgun();
   },
   initShotgun: function() {
+
     var shotgun = {
       timer: 0,
       offset: 0,
+      waveTick: 0,
       canShoot: true,
       animationFrame: [0,1,2,3,4,5,6,5,4],
       mesh: BABYLON.MeshBuilder.CreatePlane('weapon', {width: 1}, scene),
@@ -39,9 +40,18 @@ var WeaponsManager = {
             //MonsterManager.list[pickInfo.pickedMesh.id].sprite.dispose();
           }
         }
-
       },
       update: function() {
+        this.currentPosition = cambox.absolutePosition.clone();
+
+        if(this.currentPosition.x != this.previousPosition.x) {
+          this.waveTick++;
+          this.mesh.position.y = (1/50) * Math.sin(this.waveTick * 0.3) - 0.45;
+          this.mesh.position.x = (1/100) * Math.cos(this.waveTick * 0.2) 
+        } else {
+          //console.log("stop")
+        }
+        this.previousPosition = this.currentPosition;
         if(this.timer > 0) {
           this.canShoot = false;
           this.timer--;
@@ -67,6 +77,8 @@ var WeaponsManager = {
     shotgun.mesh.parent = cambox;
     shotgun.mesh.material.hasAlpha = true;
     shotgun.mesh.material.alpha = 1;
+
+    shotgun.previousPosition = cambox.absolutePosition.clone();
 
     window.addEventListener('click', function(e) {
       if(shotgun.canShoot) {
