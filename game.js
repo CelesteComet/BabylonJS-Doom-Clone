@@ -7,6 +7,7 @@ import WeaponsManager from './WeaponsManager';
 import ProjectileManager from './ProjectileManager';
 import MapManager from './MapManager';
 import UIManager from './UIManager';
+import NodeGraph from './NodeGraph';
 
 
 var game = {
@@ -28,7 +29,7 @@ var game = {
 
 
 
-
+    var nodeGraph = new NodeGraph;
 
     // create some monsters
     for(var i = 0; i < 0; i++) {
@@ -38,6 +39,7 @@ var game = {
 
     console.log("Running the engine loop");
     engine.runRenderLoop(function(){
+      nodeGraph.update();
       MonsterManager.update();
       WeaponsManager.update();
       ProjectileManager.update();
