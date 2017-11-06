@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import { scene, debug, camera, cambox } from './globals';
 import Sounds from './sounds';
+import UIManager from './UIManager';
 
 var SpriteManagerFireball = new BABYLON.SpriteManager("SpriteManagerFireball", "sprites/fireballs.png", 20000 , 15, scene);
 
@@ -52,6 +53,7 @@ const ProjectileManager = new (function() {
         o.sprite.dispose();
         if(!debug) {
           Sounds.doomGuyInPain.play();
+          UIManager.takeDamage(3);
         }
         delete ProjectileManager.list[o.id]
       }

@@ -23,6 +23,7 @@
     "@babel/preset-env": "^7.0.0-beta.31",
     "babel-loader": "^8.0.0-beta.0",
     "babylonjs": "^3.1.0-alpha3.7",
+    "babylonjs-gui": "^3.1.0-alpha3.7",
     "express": "^4.16.2",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"

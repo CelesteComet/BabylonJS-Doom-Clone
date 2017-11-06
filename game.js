@@ -6,6 +6,7 @@ import MonsterManager from './MonsterManager';
 import WeaponsManager from './WeaponsManager';
 import ProjectileManager from './ProjectileManager';
 import MapManager from './MapManager';
+import UIManager from './UIManager';
 
 
 var game = {
@@ -19,6 +20,7 @@ var game = {
     MonsterManager.init(assets);
     WeaponsManager.init(assets);
     MapManager.init(assets);
+    UIManager.init();
     
 
     console.log("Adding beautiful lights");

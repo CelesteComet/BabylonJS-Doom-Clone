@@ -4,6 +4,8 @@ import opts from './options';
 import Sounds from './sounds';
 import Utils from './utils';
 import MonsterManager from './MonsterManager';
+import UIManager from './UIManager';
+
 const { debug } = opts;
     // create the user interface including the gun
 
@@ -20,6 +22,7 @@ var WeaponsManager = {
   initShotgun: function() {
 
     var shotgun = {
+      ammo: 100,
       timer: 0,
       offset: 0,
       waveTick: 0,
@@ -27,6 +30,8 @@ var WeaponsManager = {
       animationFrame: [0,1,2,3,4,5,6,5,4],
       mesh: BABYLON.MeshBuilder.CreatePlane('weapon', {width: 1}, scene),
       shoot: function() {
+        shotgun.ammo--;
+        UIManager.reduceAmmo(1);
         Sounds.shotgunBlast.play();
         this.timer = 55;
         var pickInfo = Utils.getCameraRayCastPickInfo();
@@ -41,12 +46,15 @@ var WeaponsManager = {
           }
         }
       },
+      hasAmmo: function() {
+        this.ammo > 1;
+      },
       update: function() {
         this.currentPosition = cambox.absolutePosition.clone();
 
         if(this.currentPosition.x != this.previousPosition.x) {
           this.waveTick++;
-          this.mesh.position.y = (1/50) * Math.sin(this.waveTick * 0.3) - 0.45;
+          this.mesh.position.y = (1/50) * Math.sin(this.waveTick * 0.3) - 0.115;
           this.mesh.position.x = (1/100) * Math.cos(this.waveTick * 0.2) 
         } else {
           //console.log("stop")
@@ -72,7 +80,7 @@ var WeaponsManager = {
 
     shotgun.mesh.material = this.materials.shotgunMaterial;
     shotgun.mesh.position.z += 2;
-    shotgun.mesh.position.y -= 0.4;
+    shotgun.mesh.position.y -= 0.115;
     shotgun.mesh.isPickable = false;
     shotgun.mesh.parent = cambox;
     shotgun.mesh.material.hasAlpha = true;
@@ -80,8 +88,11 @@ var WeaponsManager = {
 
     shotgun.previousPosition = cambox.absolutePosition.clone();
 
+    // Set UI Manager to show shotgun ammo
+    UIManager.ammo = shotgun.ammo;
+
     window.addEventListener('click', function(e) {
-      if(shotgun.canShoot) {
+      if(shotgun.canShoot && shotgun.hasAmmo) {
         shotgun.shoot();
       }
     })
