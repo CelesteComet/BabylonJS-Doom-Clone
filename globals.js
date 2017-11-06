@@ -22,6 +22,9 @@ var assetsManager = new BABYLON.AssetsManager(scene);
 // create the camera
 //var camera = new BABYLON.UniversalCamera('camera1', new BABYLON.Vector3(0, 2, -2), scene);
 var camera = new BABYLON.DeviceOrientationCamera("DevOr_camera", new BABYLON.Vector3(0, 2, -2), scene);
+    // Sets the sensitivity of the camera to movement and rotation
+    camera.angularSensibility = 10;
+    camera.moveSensibility = 10;
 camera.applyGravity = true;
 camera.checkCollisions = true;
 camera.ellipsoid = new BABYLON.Vector3(0.1, 1.5, 0.2);
