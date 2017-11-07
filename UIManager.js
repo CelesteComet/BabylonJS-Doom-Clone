@@ -19,13 +19,10 @@ var UIManager = {
     this.display('armor');
     this.display('ammo');
     this.display('health');
+    this.displayDoomGuyFace();
   },
   display: function(type) {
     var array;
-
-    
-    
-    
 
     if(type == 'health') {
       this.healthContainer = new GUI.Rectangle();
@@ -87,7 +84,6 @@ var UIManager = {
         }
       }
 
-
       numbersImage.top = '40.5%';
       if(type == 'health') {
         this.healthContainer.addControl(numbersImage);
@@ -102,15 +98,10 @@ var UIManager = {
         this.ammoContainer.addControl(numbersImage);
         
       }
-
-      
     }   
         this.GUI.addControl(this.ammoContainer)
         this.GUI.addControl(this.healthContainer)  
         this.GUI.addControl(this.armorContainer)  
-
-    
-
   },
   takeDamage(n) {
     if(this.health > 0) {
@@ -128,6 +119,16 @@ var UIManager = {
     }
     this.ammoContainer.dispose();
     this.display('ammo');
+  },
+  displayDoomGuyFace: function() {
+    var doomGuyFace = new GUI.Image("doomGuyFace", "textures/doomface.png");
+    doomGuyFace.height = "14.81%";
+    doomGuyFace.width = '13%';
+    doomGuyFace.left = '3.2%';
+    doomGuyFace.verticalAlignment = 1;
+    doomGuyFace.sourceWidth = 30;
+    doomGuyFace.sourceLeft = 0;
+    this.GUI.addControl(doomGuyFace);
   }
 
 }
