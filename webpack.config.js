@@ -6,14 +6,7 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.css$/, loader: "style!css" },
-      {
-         test: /\.js$/,
-         loader: 'babel-loader',
-         query: {
-             presets: ['es2015']
-         }
-      }
+      { test: /\.css$/, loader: "style!css" }
     ],
     rules: [
       {
@@ -22,7 +15,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
+            presets: ['babel-preset-es2015']
           }
         }
       }

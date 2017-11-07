@@ -32,9 +32,11 @@ var game = {
     var nodeGraph = new NodeGraph;
 
     // create some monsters
-    for(var i = 0; i < 0; i++) {
-      var m = MonsterManager.create();
-      m.hitbox.position.x += i * 5;
+    for(var i = 0; i < 1; i++) {
+        var m = MonsterManager.create();
+        m.hitbox.position = new BABYLON.Vector3(30, -19, 30)
+        m.sprite.position = m.hitbox.position;
+
     }
 
     console.log("Running the engine loop");

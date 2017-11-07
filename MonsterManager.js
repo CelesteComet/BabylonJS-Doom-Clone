@@ -6,15 +6,8 @@ import opts from './options';
 import MapManager from './MapManager';
 
 const { debug } = opts;
-/*
-  var testBox = BABYLON.MeshBuilder.CreateBox('cam', {height: 5, width: 5, depth: 1}, scene)
-  testBox.material = Materials.woodenCrateMaterial;
-  testBox.position.y += 1;
-  testBox.position.z += 6;
-  testBox.isPickable = true;
-*/
-var ground;
 
+var ground;
 
 var MonsterManager = {
   init: function(assets) {
@@ -74,24 +67,29 @@ var MonsterManager = {
       o.sprite.size = 2.8;
       //o.sprite.position = o.hitbox.position;
       //o.sprite.position.y += 100;
-      o.sprite.playAnimation(0, 3, true, 300);
+      //o.sprite.playAnimation(0, 3, true, 300);
+
+
+      o.playAnimation = function(animationName) {
+        const animations = {
+          walkForward: [0, 3, true, 300],
+          dead: [15, 19, false, 150],
+          shootAndThenMove: [12, 14, false, 150, function() {
+            o.fire();
+            o.playAnimation('walkForward');
+            o.vX = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1);
+            o.vZ = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1);
+          }]
+        };
+        o.sprite.playAnimation(...animations[animationName]);
+      }
+
+      o.playAnimation('walkForward');
 
       // Sprite Actions
       o.shootFireball = function() {
         o.stopMoving();
-        o.sprite.playAnimation(12, 14, false, 150, function() {
-          o.fire();
-          o.sprite.playAnimation(0, 3, false, 200, function() {
-
-            o.vX = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
-            o.vZ = Math.random() * 0.05 * (Math.floor(Math.random()*2) == 1 ? 1 : -1)
-            o.sprite.playAnimation(0, 3, true, 200);
-          });
-        });
-      }
-
-      o.playMoveAnimation = function() {
-
+        o.playAnimation('shootAndThenMove');
       }
 
       o.stopMoving = function() {
@@ -101,13 +99,14 @@ var MonsterManager = {
 
       o.die = function() {
         o.dead = true;
-        o.sprite.playAnimation(15, 19, false, 150);
+        o.playAnimation('dead');
         o.hitbox.dispose();
         Sounds.pain.play();
       }
 
       // Update
       o.update = function() {
+        console.log(camera.position.subtract(o.hitbox.position).length());
         o.tick++;
         for(let id in MapManager.list) {
           if(o.hitbox.intersectsMesh(MapManager.list[id])) {
@@ -126,6 +125,7 @@ var MonsterManager = {
           o.vZ = 0;
           return;
         }
+
         if(Math.random() < 0.01 && !o.dead) {
           o.shootFireball();
         }

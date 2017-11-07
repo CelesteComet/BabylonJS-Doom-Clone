@@ -8,9 +8,9 @@ function NodeGraph() {
   
   this.graph = [];
 
-  for(let i = 0; i < 20; i++) {
+  for(let i = 0; i < 50; i++) {
     var row = [];
-    for(let j = 0; j < 20; j++) {
+    for(let j = 0; j < 50; j++) {
       row.push( new Node(new BABYLON.Vector3(1 * i, -19.5, 1 * j)) );
     }
     this.graph.push(row);
