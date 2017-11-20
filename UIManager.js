@@ -1,4 +1,11 @@
 import * as GUI from 'babylonjs-gui';
+import KeyboardManager from './KeyboardManager';
+import Sounds from './sounds';
+import Utils from './utils';
+import MonsterManager from './MonsterManager';
+import * as BABYLON from 'babylonjs';
+import { scene, camera } from './globals';
+import ParticleManager from './ParticleManager';
 
 var UIManager = {
   health: 10,
@@ -8,8 +15,16 @@ var UIManager = {
   ammo: 0,
   ammoContainer: new GUI.Rectangle(),
   GUI: GUI.AdvancedDynamicTexture.CreateFullscreenUI("hud"),
+  index: 0,
+  tick: 0,
+  moving: false,
+  shooting: false,
   init: function() {
-    
+    console.log("Initalizing your arsenal of guns");
+    for(let gunName in this.guns) {
+      this.guns[gunName].init();
+    }
+    this.bringOutCurrentGun();
     var image = new GUI.Image("but", "textures/hud.png");
     image.verticalAlignment = 1;
     image.width = "100%";
@@ -19,7 +34,105 @@ var UIManager = {
     this.display('armor');
     this.display('ammo');
     this.display('health');
-    this.displayDoomGuyFace();
+    this.displayDoomGuyFace();    
+  },
+  guns: {
+    chaingun: {
+      image: new GUI.Image('chaingun', 'sprites/chaingun.png'),
+      sourceWidth: 114,
+      width: '20%',
+      height: '50%',
+      top: '20%',
+      moveTick: 0,
+      init: function() {
+        var chainGunImage = this.image;
+        chainGunImage.sourceWidth = 114;
+        chainGunImage.width = '20%';
+        chainGunImage.height = '50%';
+        chainGunImage.top = '20%';
+        UIManager.GUI.addControl(chainGunImage);
+        UIManager.currentGun = 'chaingun';
+      },
+      shoot: function() {
+        var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
+
+        var arr = [114, 228];
+        UIManager.tick += 1;
+        this.moveTick = 0;
+        if(UIManager.tick % 7 == 0) {
+        if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
+          ParticleManager.emit('blood', pickInfo.pickedPoint);
+
+          MonsterManager.list[pickInfo.pickedMesh.id].getHurt(35);
+        }
+
+          UIManager.index += 1;
+          Sounds.chaingun.play(0.8);
+        }
+
+        
+        if(UIManager.index > 1) {
+          UIManager.index = 0;
+        }
+        UIManager.guns[UIManager.currentGun].image.sourceLeft = arr[UIManager.index]
+      },
+      stopShooting: function() {
+        var arr = [0, 114, 228];
+        UIManager.guns[UIManager.currentGun].image.sourceLeft = arr[0];
+      },
+      moveGun: function() {
+        this.moveTick++;
+        this.image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.3;
+        this.image.left = 300 * (0.1) * Math.sin(0.05 * this.moveTick);
+      },
+      stopMovingGun: function() {
+        
+        var imageLeftInt = parseInt(this.image.left.match(/(.+)px/)[1])
+        if(imageLeftInt > 0) {
+          imageLeftInt -= 1;
+          this.image.left = imageLeftInt;
+        }
+        if(imageLeftInt < 0) {
+          imageLeftInt += 1;
+          this.image.left = imageLeftInt;
+        }
+
+        var imageTopInt = parseInt(this.image.top.match(/(.+)%/)[1])
+        var originalTop = parseInt(this.top.match(/(.+)%/)[1])
+        if(imageTopInt > originalTop) {
+          imageTopInt -= 1;
+          this.image.top = imageTopInt + '%';
+        }
+
+        if(imageTopInt < originalTop) {
+          imageTopInt += 1;
+          this.image.top = imageTopInt + '%';
+        }
+
+      }
+    },
+  },
+  bringOutCurrentGun: function() {
+    /*
+    this.currentGun = new GUI.Image('chaingun', 'sprites/chaingun.png');
+    this.currentGun.sourceWidth = 114;
+    this.currentGun.width = '20%';
+    this.currentGun.height = '50%';
+    this.currentGun.top = '20%';
+    this.GUI.addControl(this.currentGun) 
+    */
+  },
+  shootGun: function() {
+    this.guns[this.currentGun].shoot();
+  },
+  stopShooting: function() {
+    this.guns[this.currentGun].stopShooting();
+  },
+  moveGun: function() {
+    this.guns[this.currentGun].moveGun();
+  },
+  stopMovingGun: function() {
+    this.guns[this.currentGun].stopMovingGun();
   },
   display: function(type) {
     var array;
@@ -129,6 +242,23 @@ var UIManager = {
     doomGuyFace.sourceWidth = 30;
     doomGuyFace.sourceLeft = 0;
     this.GUI.addControl(doomGuyFace);
+  },
+  update: function() {
+    if(this.moving && !this.shooting) {
+      this.moveGun();
+    } else {
+      this.stopMovingGun();
+    }
+
+    if(this.shooting) {
+      this.shootGun();
+    } else {
+      this.stopShooting();
+    }
+
+    if(this.shooting && this.moving) {
+      this.stopMovingGun();
+    }
   }
 
 }

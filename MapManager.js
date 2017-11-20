@@ -1,125 +1,141 @@
 import * as BABYLON from 'babylonjs';
-import { scene, camera } from './globals';
-import Utils from './utils';
-import MonsterManager from './MonsterManager';
+import { scene } from './globals';
 
+var bustomMesh = new BABYLON.Mesh("wall", scene);
 
-const MapManager = {
-  scaling: ['x', 'y', 'z'],
-  scalingIndex: 0,
+var mapManager = {
+  list: {},
   init: function(assets) {
     this.materials = assets.materials;
-    this.list = {};
-    this.active = false;
-    window.addEventListener('keydown', function(e) {
-      if(e.keyCode == 187) { 
-        if(!this.active) {
-          this.run(); 
-        } else {
-          this.stop();
-        }
-      }
-    }.bind(this))
+    this.run();
 
+    var ground = BABYLON.MeshBuilder.CreateGround("gd", {width: 500, height: 500, subdivsions: 1}, scene);
+    ground.checkCollisions = true;
+    ground.material = mapManager.materials.e1m1floor;
+    ground.material.diffuseTexture.uScale = 500;
+    ground.material.diffuseTexture.vScale = 500;
+    ground.material.bumpTexture.uScale = 500;
+    ground.material.bumpTexture.vScale = 500;
+    ground.setPivotMatrix(BABYLON.Matrix.Translation(50/2, 0, 50/2));
+    ground.id = Math.random()
+    mapManager.list[ground.id] = ground;
 
+    var ceiling = BABYLON.MeshBuilder.CreateBox("gd", {width: 500, height: 500, subdivsions: 1}, scene);
+    ceiling.checkCollisions = false;
+    ceiling.rotation.x = Math.PI/2;
+    ceiling.position.y += 35;
+    ceiling.material = mapManager.materials.e1m1ceil;
+    ceiling.material.diffuseTexture.uScale = 500;
+    ceiling.material.diffuseTexture.vScale = 500;
+    ceiling.material.bumpTexture.uScale = 500;
+    ceiling.material.bumpTexture.vScale = 500;
+    ceiling.setPivotMatrix(BABYLON.Matrix.Translation(50/2, 0, 50/2));
+    ceiling.id = Math.random()
+
+    var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, -3), scene);
   },
   run: function() {
-    camera.applyGravity = false;
-    this.deleteMode = false;
-    window.addEventListener('click', function(e) {
-      if(this.active) {
-        if(this.deleteMode) {
-          var pickInfo = Utils.getCameraRayCastPickInfo();
-          if(pickInfo.pickedMesh) {
-            pickInfo.pickedMesh.dispose();
-          }
-        } else {
-          var mesh = this.create();
-          mesh.id = Math.random();
-          mesh.position = this.guideBox.position;
-          this.list[mesh.id] = mesh;
-        }
-      }
-    }.bind(this))
 
-    window.addEventListener('keyup', function(e) {
-      var self = this; 
-      if(e.keyCode == 219) {
-
-        this.guideBox.scaling[this.scaling[this.scalingIndex]] += 0.5;
-      } // +
-
-      if(e.keyCode == 221) {
-        if(this.guideBox.scaling[this.scaling[this.scalingIndex]] > 0.5) {
-          this.guideBox.scaling[this.scaling[this.scalingIndex]] -= 0.5;
-        }
-      }
-
-      if(e.keyCode == 220) {
-        this.scalingIndex++;
-        if(this.scalingIndex >= this.scaling.length) {
-          this.scalingIndex = 0;
-        }
-      }
-      if(e.keyCode == 191) {
-        var m = MonsterManager.create();
-        m.hitbox.position = this.guideBox.position;
-        m.sprite.position = this.guideBox.position;
-      } //?)
-
-      if(e.keyCode == 189) {
-        this.turnOnDeleteMode();
-      }
-    }.bind(this))
-    this.active = true;
-    this.guideBox = BABYLON.MeshBuilder.CreateBox('pointerPlane', {height: 1, width: 1, depth: 1}, scene);
-    this.guideBox.isPickable = false;
-    this.guideBox.material = this.materials.wireFrame;
-      
-
-    this.pointerPlane = {
-      mesh: BABYLON.MeshBuilder.CreateBox('pointerPlane', {height: 1, width: 1, depth: 0.1}, scene),
-    }
-
-    
-
-    this.pointerPlane.mesh.position.z += 14;
-    this.pointerPlane.mesh.material = this.materials.wireFrame.clone();
-    //this.pointerPlane.mesh.material.alpha = 0;
-    this.pointerPlane.mesh.parent = camera;
   },
-  stop: function() {
-    camera.applyGravity = true;
-    this.active = false;
-    this.guideBox.dispose();
-    this.pointerPlane.mesh.dispose();
-  },
-  update: function() {  
+  createWall: function(startVertex, endVertex, height) {
 
-    if(this.active && Utils.getCameraRayCastPosition()) {
-      var pos = Utils.getCameraRayCastPosition();
-      var x = Utils.getNearestRound(pos.x, 0.5);
-      var y = Utils.getNearestRound(pos.y, 0.5);
-      var z = Utils.getNearestRound(pos.z, 0.5);
-      this.guideBox.position = new BABYLON.Vector3(x, y, z);
-    }
-  },
-  create: function() {
-    var id = Math.random();
-    var width = this.guideBox.scaling.x;
-    var height = this.guideBox.scaling.y;
-    var depth = this.guideBox.scaling.z;
-    return BABYLON.MeshBuilder.CreateBox(`${id}`, {height: height, width: width, depth: depth}, scene);
-  },
-  turnOnDeleteMode: function() {
-    this.deleteMode = true;
-    this.pointerPlane.mesh.dispose();
-    this.pointerPlane = null;
+    // Clone custom mesh 
+    var wallInstance = bustomMesh.clone('wall');
+
+    // Give wallInstance an id 
+    wallInstance.id = Math.random();
+
+    // Create custom mesh positions from vertices
+    var {x, y, z} = startVertex;
+    var positions = [
+      x, height, z, x, 0, z, endVertex.x, 0, endVertex.z,
+      x, height, z, endVertex.x, 0, endVertex.z, endVertex.x, height, endVertex.z
+    ];
+
+    // Create indices for each of the vertex positions
+    var indices = [0, 1, 2, 3, 4, 5];
+
+    // Calculate normals
+    var normals = [];
+    BABYLON.VertexData.ComputeNormals(positions, indices, normals);
+
+    // Create UVS for textures
+    var uvs = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1];
+
+    // Create vertexData object to apply to the custom mesh, uses positions and indices
+    var vertexData = new BABYLON.VertexData();
+    vertexData.positions = positions;
+    vertexData.indices = indices;
+    vertexData.normals = normals;
+    vertexData.uvs = uvs;
+
+    // Apply vertexData to custom mesh
+    vertexData.applyToMesh(wallInstance);    
+
+    // Find length between vertices
+    var length = Math.sqrt(Math.pow(endVertex.x - startVertex.x, 2) + Math.pow(endVertex.z - startVertex.z, 2));
+
+    // Expose startVertex and endVertex objects for map drawing
+    wallInstance.startVertex = startVertex;
+    wallInstance.endVertex = endVertex;
+
+    wallInstance.material = this.materials.e1m1wall.clone();
+    wallInstance.material.diffuseTexture.uScale = length/4;
+    wallInstance.material.diffuseTexture.vScale = 2;
+    wallInstance.material.bumpTexture.uScale = length/4;
+    wallInstance.material.bumpTexture.vScale = 2;
+
+    showNormals(wallInstance, 5, null, scene);
+    this.list[wallInstance.id] = wallInstance;  
+    return wallInstance;
   }
+
+}
+
+function vertex(x, y, z) {
+  this.x = x;
+  this.y = y;
+  this.z = z;
+  return this;
+}
+
+function showNormals(mesh, size, color, sc) {
+  var normals = mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+  var positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);      
+  color = color || BABYLON.Color3.White();
+  sc = sc || scene;
+  size = size || 1;
+
+  var lines = [];
+  for (var i = 0; i < normals.length; i += 3) {
+      var v1 = BABYLON.Vector3.FromArray(positions, i);
+      var v2 = v1.add(BABYLON.Vector3.FromArray(normals, i).scaleInPlace(size));
+      lines.push([v1.add(mesh.position), v2.add(mesh.position)]);
+  }
+  var normalLines = BABYLON.MeshBuilder.CreateLineSystem("normalLines", {lines: lines}, sc);
+  normalLines.color = color;
+  return normalLines;
 }
 
 
 
 
 
-export default MapManager;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export { vertex, mapManager }
+
+
+

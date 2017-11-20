@@ -9,11 +9,17 @@ const assets = {
   materials: {}
 };
 
-// put the Babylon name of the song as the key and the file name as the value
+
 const textures = {
   'wireFrame': { type: 'diffuse', fileName: 'woodenCrate.jpg' }, // change in the future
   'bulletHoleMaterial': { type: 'diffuse', fileName: 'impact.png' },
   'woodenCrate': { type: 'diffuse', fileName: 'woodenCrate.jpg' },
+  'e1m1wall': { type: 'diffuse', fileName: 'e1m1wall.png' },
+  'e1m1wallBump': { type: 'bump', for: 'e1m1wall', fileName: 'NormalMap.png' },
+  'e1m1floor': { type: 'diffuse', fileName: 'e1m1floor.png' },
+  'e1m1floorBump': { type: 'bump', for: 'e1m1floor', fileName: 'bump_e1m1floor.png' },
+  'e1m1ceil': { type: 'diffuse', fileName: 'e1m1ceil.png' },
+  'e1m1ceilBump': { type: 'bum[', for: 'e1m1ceil', fileName: 'bump_e1m1ceil.png' }
 };
 
 const numberOfTextures = Object.keys(textures).length;
@@ -25,8 +31,13 @@ for(let textureName in textures) {
   imageTask.onSuccess = function(task) {
     if(verbose) { console.log(`loaded ${textureName}`); }
     loadedTextures++;
-    assets.materials[textureName] = new BABYLON.StandardMaterial(textureName, scene);
-    assets.materials[textureName][textures[textureName].type + 'Texture'] = new BABYLON.Texture('textures/' + textures[textureName].fileName);
+    if(textures[textureName].for) {
+      console.log("ASD")
+      assets.materials[textures[textureName].for].bumpTexture = new BABYLON.Texture('textures/' + textures[textureName].fileName);
+    } else {
+      assets.materials[textureName] = new BABYLON.StandardMaterial(textureName, scene);
+      assets.materials[textureName][textures[textureName].type + 'Texture'] = new BABYLON.Texture('textures/' + textures[textureName].fileName);
+    }
     if(loadedTextures == numberOfTextures) {
       assets.materials.bulletHoleMaterial.diffuseTexture.hasAlpha = true; 
       assets.materials.bulletHoleMaterial.zOffset = -2;
@@ -37,6 +48,8 @@ for(let textureName in textures) {
       shotgunTexture.uScale = 1/7;
       shotgunTexture.hasAlpha = true;
       assets.materials.shotgunMaterial.diffuseTexture = shotgunTexture;
+
+
     }
   }
 };

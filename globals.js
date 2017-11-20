@@ -21,7 +21,7 @@ var assetsManager = new BABYLON.AssetsManager(scene);
 
 // create the camera
 var camera = new BABYLON.UniversalCamera('camera1', new BABYLON.Vector3(0, 2, -2), scene);
-camera.applyGravity = true;
+camera.applyGravity = false;
 camera.checkCollisions = true;
 camera.ellipsoid = new BABYLON.Vector3(0.1, 1.5, 0.2);
 // target the camera to scene origin
@@ -37,7 +37,7 @@ camera.keysLeft.push(65);
 camera.keysRight.push(68);
 
 // limit camera speed
-camera.speed = 0.4;
+camera.speed = 1;
 
 // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
 var cambox = BABYLON.MeshBuilder.CreateBox('cam', {height: 0.8, width: 1, depth: 1}, scene);

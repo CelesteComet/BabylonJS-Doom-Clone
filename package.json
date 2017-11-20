@@ -27,6 +27,8 @@
   "dependencies": {
     "babylonjs": "^3.1.0-beta1.0",
     "babylonjs-gui": "^3.1.0-beta1.0",
-    "express": "^4.16.2"
+    "easystarjs": "^0.4.1",
+    "express": "^4.16.2",
+    "pathfinding": "^0.4.18"
   }
 }

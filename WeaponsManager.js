@@ -5,6 +5,7 @@ import Sounds from './sounds';
 import Utils from './utils';
 import MonsterManager from './MonsterManager';
 import UIManager from './UIManager';
+import KeyboardManager from './KeyboardManager';
 
 const { debug } = opts;
     // create the user interface including the gun
@@ -22,7 +23,8 @@ var WeaponsManager = {
   initShotgun: function() {
 
     var shotgun = {
-      ammo: 100,
+      ammo: 50,
+      pallets: 5,
       timer: 0,
       offset: 0,
       waveTick: 0,
@@ -34,7 +36,41 @@ var WeaponsManager = {
         UIManager.reduceAmmo(1);
         Sounds.shotgunBlast.play();
         this.timer = 55;
-        var pickInfo = Utils.getCameraRayCastPickInfo();
+        //var pickInfo = Utils.getCameraRayCastPickInfo();
+        for(let i = 0; i < this.pallets; i++) {
+
+          var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
+          if(pickInfo.pickedMesh) {
+            var decalSize = new BABYLON.Vector3(0.1, 0.1, 0.1);
+            var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
+
+            decal.material = WeaponsManager.materials.bulletHoleMaterial;
+            if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
+          var particleSystem = new BABYLON.ParticleSystem("particles", 400, scene);
+        particleSystem.particleTexture = new BABYLON.Texture("textures/Flare.png", scene);
+        particleSystem.emitter = pickInfo.pickedPoint;
+    particleSystem.minSize = 0.1;
+    particleSystem.maxSize = 0.3;
+    particleSystem.emitRate = 6000;
+    particleSystem.targetStopDuration = 1;
+particleSystem.minEmitPower = 1;
+particleSystem.maxEmitPower = 1;
+particleSystem.color1 = new BABYLON.Color4(0.1, 0, 0, 1);
+particleSystem.color2 = new BABYLON.Color4(0.1, 0, 0, 1);
+    particleSystem.gravity = new BABYLON.Vector3(0, -150.81, 0);
+    particleSystem.disposeOnStop = true;
+particleSystem.direction1 = new BABYLON.Vector3(-7, 8, 3);
+particleSystem.direction2 = new BABYLON.Vector3(7, 8, -3);
+
+    particleSystem.start()
+              // find the monster in the list, play the death animation, then dispose
+              MonsterManager.list[pickInfo.pickedMesh.id].die();
+              //MonsterManager.list[pickInfo.pickedMesh.id].sprite.dispose();
+            }
+          }
+        }
+        /*
+        
         if(pickInfo.pickedMesh) {
           var decalSize = new BABYLON.Vector3(0.1, 0.1, 0.1);
           var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
@@ -45,9 +81,10 @@ var WeaponsManager = {
             //MonsterManager.list[pickInfo.pickedMesh.id].sprite.dispose();
           }
         }
+        */
       },
       hasAmmo: function() {
-        this.ammo > 1;
+        return shotgun.ammo >= 1;
       },
       update: function() {
         this.currentPosition = cambox.absolutePosition.clone();
@@ -91,11 +128,6 @@ var WeaponsManager = {
     // Set UI Manager to show shotgun ammo
     UIManager.ammo = shotgun.ammo;
 
-    window.addEventListener('click', function(e) {
-      if(shotgun.canShoot && shotgun.hasAmmo) {
-        shotgun.shoot();
-      }
-    })
 
     return shotgun;
   }, 
