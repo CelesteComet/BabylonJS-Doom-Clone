@@ -3,7 +3,7 @@ import { scene, camera } from './globals';
 import ProjectileManager from './ProjectileManager';
 import Sounds from './sounds';
 import opts from './options';
-import { mapManager } from './mapManager';
+import { MapManager } from './MapManager';
 import Utils from './utils';
 import SpriteManager from './SpriteManager';
 
