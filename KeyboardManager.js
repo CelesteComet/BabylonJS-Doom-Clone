@@ -7,7 +7,10 @@ const KeyboardManager = {
   keys: {
     'leftClick': false,
     'plus': false,
-    'w': false
+    'w': false,
+    'a': false,
+    's': false,
+    'd': false
   },
   init: function() {
     // Attach eventhandlers to the render canvas
@@ -27,6 +30,15 @@ const KeyboardManager = {
         case 87: // W
           this.keys['w'] = true;
           break;
+        case 65: 
+          this.keys['a'] = true;
+          break;
+        case 83: 
+          this.keys['s'] = true;
+          break;
+        case 68:
+          this.keys['d'] = true;
+          break;
         case 51: // 3
           UIManager.bringOutCurrentGun("shotgun");
           break;
@@ -44,8 +56,17 @@ const KeyboardManager = {
         case 61:
           camera.applyGravity = true;
           break;
-        case 87: // W
+        case 87: 
           this.keys['w'] = false;
+          break;
+        case 65: 
+          this.keys['a'] = false;
+          break;
+        case 83: 
+          this.keys['s'] = false;
+          break;
+        case 68:
+          this.keys['d'] = false;
           break;
         default: 
           break;
@@ -77,7 +98,9 @@ const KeyboardManager = {
       UIManager.shooting = false;
     }
 
-    if(this.keys['w']) {
+    // Check each movement key to see if it is moving
+    const { w, a, s, d } = this.keys;
+    if(w || a || s || d) {
       UIManager.moving = true;
     } else {
       UIManager.moving = false;

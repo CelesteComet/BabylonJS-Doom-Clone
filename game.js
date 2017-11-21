@@ -47,11 +47,11 @@ var game = {
         Imp.sprite.position = Imp.hitbox.position;
     }
 
-    var a = MapManager.createWall(new vertex(0, 0, 0), new vertex(10, 0, 0), 10);
+    //var a = MapManager.createWall(new vertex(0, 0, 0), new vertex(10, 0, 0), 10);
     
     
 
-    var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
+    //var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
 
       
 

@@ -28,6 +28,7 @@ var MonsterManager = {
       // Set monster game properties
       // -------------------------------------------------------------------------
       monsterInstance.health = 100;
+      monsterInstance.moveVector = new BABYLON.Vector3(0,0,0);
       // -------------------------------------------------------------------------
 
       // Set monster hitbox properties
@@ -51,7 +52,7 @@ var MonsterManager = {
       monsterInstance.hitbox.id = monsterInstance.id;
       // Add material to monster hitbox
       monsterInstance.hitbox.material = this.materials.wireFrame;
-      monsterInstance.hitbox.material.alpha = 0;
+      monsterInstance.hitbox.material.alpha = + opts.debug;
       // -------------------------------------------------------------------------
 
 
@@ -84,6 +85,7 @@ var MonsterManager = {
       }
 
       monsterInstance.getHurt = function(pain) {
+        monsterInstance.pushBack(10);
         this.inPain = true;
         this.health -= pain;
       }
@@ -93,6 +95,11 @@ var MonsterManager = {
         this.sprite.playAnimation(...this.animations['dead']);
         Math.random() < 0.5 ? Sounds.impDeath1.play(1) : Sounds.impDeath2.play(1);
         this.hitbox.dispose();
+      }
+
+      monsterInstance.pushBack = function(frames) {
+        this.moveFrames = frames;
+        this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize();
       }
       // -------------------------------------------------------------------------
 
@@ -114,6 +121,14 @@ var MonsterManager = {
           }.bind(this));
           this.inPain = false;
         }
+
+        
+        if(this.moveFrames > 0) {
+          this.hitbox.position.x += this.moveVector.x;
+          this.hitbox.position.z += this.moveVector.z;
+          this.moveFrames--;
+        }
+        //this.hitbox.position.y += this.moveVector.y;
       }
 
 

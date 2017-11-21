@@ -1,6 +1,6 @@
 const opts = {
   verbose: true,
-  debug: true, 
+  debug: false, 
   showNormals: true,
   showAxis: true
 };

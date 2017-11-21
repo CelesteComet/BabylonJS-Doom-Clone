@@ -67,7 +67,12 @@ var UIManager = {
         this.moveTick = 0;
         if(UIManager.tick % 7 == 0) {
           var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
+
           if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
+            var decalSize = new BABYLON.Vector3(0.1, 0.1, 0.1);
+            var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
+
+            decal.material = UIManager.materials.bulletHoleMaterial;
             ParticleManager.emit('blood', pickInfo.pickedPoint);
 
             MonsterManager.list[pickInfo.pickedMesh.id].getHurt(1000);
