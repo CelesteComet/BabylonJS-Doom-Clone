@@ -3,7 +3,7 @@ import { scene } from './globals';
 
 var bustomMesh = new BABYLON.Mesh("wall", scene);
 
-var mapManager = {
+var MapManager = {
   list: {},
   init: function(assets) {
     this.materials = assets.materials;
@@ -11,27 +11,27 @@ var mapManager = {
 
     var ground = BABYLON.MeshBuilder.CreateGround("gd", {width: 500, height: 500, subdivsions: 1}, scene);
     ground.checkCollisions = true;
-    ground.material = mapManager.materials.e1m1floor;
+    ground.material = MapManager.materials.e1m1floor;
     ground.material.diffuseTexture.uScale = 500;
     ground.material.diffuseTexture.vScale = 500;
     ground.material.bumpTexture.uScale = 500;
     ground.material.bumpTexture.vScale = 500;
     ground.setPivotMatrix(BABYLON.Matrix.Translation(50/2, 0, 50/2));
     ground.id = Math.random()
-    mapManager.list[ground.id] = ground;
-
+    MapManager.list[ground.id] = ground;
+/*
     var ceiling = BABYLON.MeshBuilder.CreateBox("gd", {width: 500, height: 500, subdivsions: 1}, scene);
     ceiling.checkCollisions = false;
     ceiling.rotation.x = Math.PI/2;
     ceiling.position.y += 35;
-    ceiling.material = mapManager.materials.e1m1ceil;
+    ceiling.material = MapManager.materials.e1m1ceil;
     ceiling.material.diffuseTexture.uScale = 500;
     ceiling.material.diffuseTexture.vScale = 500;
     ceiling.material.bumpTexture.uScale = 500;
     ceiling.material.bumpTexture.vScale = 500;
     ceiling.setPivotMatrix(BABYLON.Matrix.Translation(50/2, 0, 50/2));
     ceiling.id = Math.random()
-
+*/
     var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, -3), scene);
   },
   run: function() {
@@ -135,7 +135,7 @@ function showNormals(mesh, size, color, sc) {
 
 
 
-export { vertex, mapManager }
+export { vertex, MapManager }
 
 
 

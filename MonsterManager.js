@@ -68,11 +68,12 @@ var MonsterManager = {
       // Animation properties are an array that is spread to fit the sprite.animation arguments
       monsterInstance.animations = {
         'walkForward': [0, 3, true, 300],
-        'dead': [15, 19, false, 150]
+        'dead': [15, 19, false, 150],
+        'hurt': [24, 25, false, 150]
       };
       
       
-      // Monster can move, fire balls, get hurt... and die.
+      // Monster can move, fire balls, can be in a state of pain... and die.
       // -------------------------------------------------------------------------
       monsterInstance.move = function() {
 
@@ -83,20 +84,12 @@ var MonsterManager = {
       }
 
       monsterInstance.getHurt = function(pain) {
+        this.inPain = true;
         this.health -= pain;
-        if(this.health < 0) {
-          this.die();
-          return;
-        }
-        Sounds.pain.attachToMesh(this.hitbox);
-        Sounds.pain.play(0.7);
-
       }
 
       monsterInstance.die = function() {
-        // Set state to 3 because 3 means the monster is dead 
-
-        this.state = 3;
+        this.dead = true;
         this.sprite.playAnimation(...this.animations['dead']);
         Math.random() < 0.5 ? Sounds.impDeath1.play(1) : Sounds.impDeath2.play(1);
         this.hitbox.dispose();
@@ -107,6 +100,20 @@ var MonsterManager = {
       monsterInstance.sprite.playAnimation(...monsterInstance.animations['walkForward']);
 
       monsterInstance.update = function() {
+
+        if(this.health < 0 && !this.dead) {
+          this.die();
+          return;
+        }
+
+        if(this.inPain && !this.dead) {
+          Sounds.pain.attachToMesh(this.hitbox);
+          Sounds.pain.play(0.7);
+          this.sprite.playAnimation(...this.animations['hurt'], function() {
+            this.sprite.playAnimation(...this.animations['walkForward']);
+          }.bind(this));
+          this.inPain = false;
+        }
       }
 
 

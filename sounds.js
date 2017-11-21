@@ -5,7 +5,7 @@ const Sounds = {};
 
 // put the Babylon name of the song as the key and the file name as the value
 const soundFileNames = {
-  'shotgunBlast': 'shotgunBlast.wav',
+  'shotgun': 'shotgunBlast.wav',
   'pain': 'pain.wav',
   'impDeath1': 'impDeath1.wav',
   'impDeath2': 'impDeath2.wav',

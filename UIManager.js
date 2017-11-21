@@ -19,12 +19,16 @@ var UIManager = {
   tick: 0,
   moving: false,
   shooting: false,
-  init: function() {
+  canShoot: true,
+  init: function(assets) {
+    this.materials = assets.materials;
     console.log("Initalizing your arsenal of guns");
     for(let gunName in this.guns) {
       this.guns[gunName].init();
     }
-    this.bringOutCurrentGun();
+    this.canSwitchGuns = true;
+    this.bringOutCurrentGun('chaingun');
+
     var image = new GUI.Image("but", "textures/hud.png");
     image.verticalAlignment = 1;
     image.width = "100%";
@@ -51,26 +55,31 @@ var UIManager = {
         chainGunImage.height = '50%';
         chainGunImage.top = '20%';
         UIManager.GUI.addControl(chainGunImage);
+        chainGunImage.isVisible = false
         UIManager.currentGun = 'chaingun';
       },
       shoot: function() {
-        var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
 
         var arr = [114, 228];
+        
+        
         UIManager.tick += 1;
         this.moveTick = 0;
         if(UIManager.tick % 7 == 0) {
-        if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
-          ParticleManager.emit('blood', pickInfo.pickedPoint);
+          var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
+          if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
+            ParticleManager.emit('blood', pickInfo.pickedPoint);
 
-          MonsterManager.list[pickInfo.pickedMesh.id].getHurt(35);
-        }
+            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(1000);
+          } else {
+            ParticleManager.emit('bulletPuff', pickInfo.pickedPoint);
+          }
 
           UIManager.index += 1;
           Sounds.chaingun.play(0.8);
         }
 
-        
+          
         if(UIManager.index > 1) {
           UIManager.index = 0;
         }
@@ -111,16 +120,134 @@ var UIManager = {
 
       }
     },
+    shotgun: {
+      image: new GUI.Image('shotgun', 'sprites/shotgun.png'),
+      sourceWidth: 114,
+      width: '30%',
+      height: '70%',
+      top: '0%',
+      moveTick: 0,
+      canShoot: true,
+      fireRate: 7,
+      pallets: 7,
+      init: function() {
+        var shotgunImage = this.image;
+        shotgunImage.sourceWidth = this.sourceWidth;
+        shotgunImage.width = this.width
+        shotgunImage.height = this.height;
+        shotgunImage.top = this.top;
+        UIManager.GUI.addControl(shotgunImage);
+        shotgunImage.isVisible = false;
+        UIManager.tick = 0;
+      },
+      shoot: function() {
+        var arr = [375, 125, 250, 375, 500, 625, 750, 625, 500, 375];
+        console.log(this.canShoot)
+        if(this.canShoot) {
+          Sounds.shotgun.play(0.8);
+          this.canShoot = false;
+          UIManager.canSwitchGuns = false;
+          for(let i = 0; i < this.pallets; i++) {
+
+            var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
+            if(pickInfo.pickedMesh) {
+              
+              var decalSize = new BABYLON.Vector3(0.1, 0.1, 0.1);
+              var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
+
+              decal.material = UIManager.materials.bulletHoleMaterial;
+
+              if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
+                ParticleManager.emit('blood', pickInfo.pickedPoint, 100);
+                // find the monster in the list, play the death animation, then dispose
+                MonsterManager.list[pickInfo.pickedMesh.id].getHurt(15);
+                //MonsterManager.list[pickInfo.pickedMesh.id].sprite.dispose();
+              }
+            }
+          }
+          UIManager.tick = arr.length * this.fireRate;
+          UIManager.index = 0;
+        }
+
+        this.stopShooting();
+
+
+
+
+        
+        
+
+
+          
+
+        
+      },
+      stopShooting: function() {
+        var arr = [375, 125, 250, 375, 500, 625, 750, 625, 500, 375];
+        if(UIManager.tick > 0) {
+          UIManager.tick -= 1;
+          if(UIManager.tick % this.fireRate == 0) {
+            UIManager.index += 1
+          }
+          if(UIManager.tick == 0) {
+            UIManager.index = 0;
+            UIManager.canSwitchGuns = true;
+            this.canShoot = true;
+          }
+        }
+        UIManager.guns[UIManager.currentGun].image.sourceLeft = arr[UIManager.index]
+      },
+      moveGun: function() {
+        if(this.canShoot) {
+          this.moveTick++;
+          this.image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.05;
+          this.image.left = 300 * (0.1) * Math.sin(0.05 * this.moveTick);
+        }
+      },
+      stopMovingGun: function() {
+        
+        var imageLeftInt = parseInt(this.image.left.match(/(.+)px/)[1])
+        if(imageLeftInt > 0) {
+          imageLeftInt -= 1;
+          this.image.left = imageLeftInt;
+        }
+        if(imageLeftInt < 0) {
+          imageLeftInt += 1;
+          this.image.left = imageLeftInt;
+        }
+
+        var imageTopInt = parseInt(this.image.top.match(/(.+)%/)[1])
+        var originalTop = parseInt(this.top.match(/(.+)%/)[1])
+        if(imageTopInt > originalTop) {
+          imageTopInt -= 1;
+          this.image.top = imageTopInt + '%';
+        }
+
+        if(imageTopInt < originalTop) {
+          imageTopInt += 1;
+          this.image.top = imageTopInt + '%';
+        }
+
+      }
+    }
   },
-  bringOutCurrentGun: function() {
-    /*
-    this.currentGun = new GUI.Image('chaingun', 'sprites/chaingun.png');
-    this.currentGun.sourceWidth = 114;
-    this.currentGun.width = '20%';
-    this.currentGun.height = '50%';
-    this.currentGun.top = '20%';
-    this.GUI.addControl(this.currentGun) 
-    */
+  bringOutCurrentGun: function(gunName) {
+    if(this.canSwitchGuns) {
+      UIManager.tick = 0;
+      UIManager.index = 0;
+      // If we have a gun equipped
+      if(this.currentGun) {
+        // Set its visibily to false
+        this.guns[this.currentGun].image.isVisible = false;
+        // Set current gun to the new gun
+        this.currentGun = gunName;
+        this.guns[gunName].image.isVisible = true;
+      } else {
+        this.currentGun = gunName;
+        this.guns[gunName].image.isVisible = true;
+      }
+    }
+
   },
   shootGun: function() {
     this.guns[this.currentGun].shoot();

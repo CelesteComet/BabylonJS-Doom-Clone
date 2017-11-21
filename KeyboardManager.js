@@ -27,6 +27,12 @@ const KeyboardManager = {
         case 87: // W
           this.keys['w'] = true;
           break;
+        case 51: // 3
+          UIManager.bringOutCurrentGun("shotgun");
+          break;
+        case 52: // 4 
+          UIManager.bringOutCurrentGun("chaingun")
+          break;
         default: 
           break;
       }

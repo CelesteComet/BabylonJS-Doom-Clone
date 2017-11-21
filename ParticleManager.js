@@ -8,6 +8,7 @@ const ParticleManager = {
   },
   effectsProperties: {
     blood: {
+      amount: 1000,
       particleTexture: new BABYLON.Texture("textures/Flare.png", scene),
       minSize: 0.1,
       maxSize: 0.3,
@@ -20,12 +21,27 @@ const ParticleManager = {
       disposeOnStop: true,
       direction1:  new BABYLON.Vector3(-7, 8, 3),
       direction2: new BABYLON.Vector3(7, 8, -3)
+    },
+    bulletPuff: {
+      amount: 10,
+      particleTexture: new BABYLON.Texture("textures/Flare.png", scene),
+      minSize: 0.05,
+      maxSize: 0.05,
+      emitRate: 6000,
+      targetStopDuration: 1,
+      minEmitPower: 10,
+      color1: new BABYLON.Color4(1, 1, 1, 1),
+      color2: new BABYLON.Color4(1, 1, 1, 1),
+      gravity: new BABYLON.Vector3(0, 0, 0),
+      disposeOnStop: true,
+      direction1:  new BABYLON.Vector3(0.5, 0.5, 0.5),
+      direction2: new BABYLON.Vector3(-0.5, 0.5, -0.5)
     }
   },
   run: function() {
     for(let effectName in this.effectsProperties) {
       var props = this.effectsProperties[effectName];
-      this[effectName] = new BABYLON.ParticleSystem("particles", 1000, scene);
+      this[effectName] = new BABYLON.ParticleSystem("particles", props.amount, scene);
 
       // this[effectName] is now a ParticleSystem object and needs to be configured
       this[effectName].particleTexture = props.particleTexture;
@@ -42,8 +58,9 @@ const ParticleManager = {
       this[effectName].direction2 = props.direction2;
     }
   },
-  emit: function(type, emitter) {
+  emit: function(type, emitter, amount) {
     var clonedParticleSystem = this[type].clone();
+    amount ? clonedParticleSystem._capacity = amount : 500
     clonedParticleSystem.emitter = emitter;
     clonedParticleSystem.start();
   }

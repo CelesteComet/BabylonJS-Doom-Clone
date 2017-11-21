@@ -1,4 +1,4 @@
-import { mapManager, vertex } from './MapManager';
+import { MapManager, vertex } from './MapManager';
 import MonsterManager from './MonsterManager';
 import * as BABYLON from 'babylonjs';
 
@@ -95,8 +95,8 @@ const MapEditor = {
          this.ctx.lineTo(this.endVertex.x, this.endVertex.y);
          this.ctx.stroke();
       }
-      for(var id in mapManager.list) {
-        var wall = mapManager.list[id];
+      for(var id in MapManager.list) {
+        var wall = MapManager.list[id];
         if(wall.name == 'wall') {
           this.ctx.beginPath()
           this.ctx.moveTo(wall.startVertex.x * 30, -wall.startVertex.z * 30);

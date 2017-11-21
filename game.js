@@ -12,7 +12,7 @@ import KeyboardManager from './KeyboardManager';
 import ParticleManager from './ParticleManager';
 
 
-import { mapManager } from './MapManager';
+import { MapManager } from './MapManager';
 import { vertex } from './MapManager';
 console.log(vertex)
 var game = {
@@ -27,8 +27,8 @@ var game = {
     console.log("Initializing Monster Manager");
     ParticleManager.init(assets);
     MonsterManager.init(assets);
-    mapManager.init(assets);
-    UIManager.init();
+    MapManager.init(assets);
+    UIManager.init(assets);
     MapEditor.init();
     KeyboardManager.init();
 
@@ -47,11 +47,11 @@ var game = {
         Imp.sprite.position = Imp.hitbox.position;
     }
 
-    var a = mapManager.createWall(new vertex(0, 0, 0), new vertex(10, 0, 0), 10);
+    var a = MapManager.createWall(new vertex(0, 0, 0), new vertex(10, 0, 0), 10);
     
     
 
-    //var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
+    var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
 
       
 
