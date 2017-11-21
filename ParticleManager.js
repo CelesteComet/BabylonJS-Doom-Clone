@@ -9,7 +9,7 @@ const ParticleManager = {
   effectsProperties: {
     blood: {
       amount: 1000,
-      particleTexture: new BABYLON.Texture("textures/Flare.png", scene),
+      particleTexture: new BABYLON.Texture("textures/flare.png", scene),
       minSize: 0.1,
       maxSize: 0.3,
       emitRate: 6000,
@@ -24,7 +24,7 @@ const ParticleManager = {
     },
     bulletPuff: {
       amount: 10,
-      particleTexture: new BABYLON.Texture("textures/Flare.png", scene),
+      particleTexture: new BABYLON.Texture("textures/flare.png", scene),
       minSize: 0.05,
       maxSize: 0.05,
       emitRate: 6000,
