@@ -10,6 +10,8 @@ canvas.addEventListener('click', function() {
 
 // load the 3D engine
 export const engine = new BABYLON.Engine(canvas, true);
+engine.loadingUIText = "DOOM";
+engine.loadingUIBackgroundColor = "black";
 
 // create a basic BJS Scene object
 const scene = new BABYLON.Scene(engine);
@@ -21,7 +23,7 @@ var assetsManager = new BABYLON.AssetsManager(scene);
 
 // create the camera
 var camera = new BABYLON.UniversalCamera('camera1', new BABYLON.Vector3(0, 2, -2), scene);
-camera.applyGravity = true;
+camera.applyGravity = false;
 camera.checkCollisions = true;
 camera.ellipsoid = new BABYLON.Vector3(0.1, 1.5, 0.2);
 // target the camera to scene origin

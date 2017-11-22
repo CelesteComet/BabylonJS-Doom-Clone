@@ -67,7 +67,6 @@ const MapEditor = {
       this.holdingMouse = false;
       if(getSelectItem('mainSelect') == 'wall') {
         MapManager.createWall(this.startVertex, this.endVertex, 10);
-        MapManager.createWall(this.endVertex, this.startVertex, 10);
       }
       this.startVertex = null;
       this.endVertex = null;

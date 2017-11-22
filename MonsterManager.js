@@ -28,7 +28,19 @@ var MonsterManager = {
       // Set monster game properties
       // -------------------------------------------------------------------------
       monsterInstance.health = 100;
+      monsterInstance.speed = 0.07;
       monsterInstance.moveVector = new BABYLON.Vector3(0,0,0);
+      monsterInstance.moves = {
+        up: new BABYLON.Vector3(0, 0, 1),
+        down: new BABYLON.Vector3(0,0,-1),
+        left: new BABYLON.Vector3(-1,0,0),
+        right: new BABYLON.Vector3(1,0,0),
+        upRight: new BABYLON.Vector3(1,0,1),
+        upLeft: new BABYLON.Vector3(-1,0,1),
+        downRight: new BABYLON.Vector3(1,0,-1),
+        downLeft: new BABYLON.Vector3(-1,0,-1)
+      }
+      monsterInstance.moveFrames = 0;
       // -------------------------------------------------------------------------
 
       // Set monster hitbox properties
@@ -76,7 +88,70 @@ var MonsterManager = {
       
       // Monster can move, fire balls, can be in a state of pain... and die.
       // -------------------------------------------------------------------------
-      monsterInstance.move = function() {
+      monsterInstance.setMoveVector = function() {
+        // create a list of vectors
+          var currentPosition = monsterInstance.hitbox.position.clone();
+          // Up movement
+          var up = currentPosition.clone();
+          up.z += 1;
+          // Down movement
+          var down = currentPosition.clone();
+          down.z -= 1;
+          // Left movement
+          var left = currentPosition.clone();
+          left.x -= 1;
+          // Right movement
+          var right = currentPosition.clone();
+          right.x += 1;
+
+          // Up Right movement
+          var upRight = currentPosition.clone();
+          upRight.z += 1;
+          upRight.x += 1;
+          // Down movement
+          var downRight = currentPosition.clone();
+          downRight.z -= 1;
+          downRight.x += 1;
+          // Left movement
+          var upLeft = currentPosition.clone();
+          upLeft.x -= 1;
+          upLeft.z += 1;
+          // Right movement
+          var downLeft = currentPosition.clone();
+          downLeft.x -= 1;
+          downLeft.z -= 1;
+
+          this.moveVectors = {
+            up, down, left, right,
+            upRight, upLeft, downRight, downLeft
+          };
+
+
+          var mapped = {};
+          // check distance between each move vector with player position
+          for(let move in this.moveVectors) { 
+            mapped[BABYLON.Vector3.Distance(this.moveVectors[move], camera.position)] = move;
+          }
+
+          // get the movement name of the smallest distance
+          var distanceArr = Object.keys(mapped);
+          var distanceKey = distanceArr.map(function(n) {
+            return parseFloat(n);
+          }).sort(function(a, b) {
+            return a - b;
+          })[0];
+
+          var direction = mapped[distanceKey];
+          this.moveFrames = 50;
+          this.moveVector = this.moves[direction];
+        // compare each vector to get distance 
+      }
+
+      monsterInstance.setRandomMoveVector = function() {
+        this.moveFrames = 10;
+        var arr = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
+        var rand = arr[Math.floor(Math.random() * arr.length)];
+        this.moveVector = this.moves[rand];
 
       }
 
@@ -99,7 +174,7 @@ var MonsterManager = {
 
       monsterInstance.pushBack = function(frames) {
         this.moveFrames = frames;
-        this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize();
+        this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize().scale(10);
       }
       // -------------------------------------------------------------------------
 
@@ -107,6 +182,9 @@ var MonsterManager = {
       monsterInstance.sprite.playAnimation(...monsterInstance.animations['walkForward']);
 
       monsterInstance.update = function() {
+        if(!this.dead && this.moveFrames <= 0) {
+          this.setMoveVector();
+        }
 
         if(this.health < 0 && !this.dead) {
           this.die();
@@ -123,13 +201,36 @@ var MonsterManager = {
         }
 
         
+
+
+        for(let id in MapManager.list) {
+          if(this.hitbox.intersectsMesh(MapManager.list[id], true) && MapManager.list[id].name == 'wall') {
+            /*
+            var arr = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
+            var rand = arr[Math.floor(Math.random() * arr.length)];
+            */
+            var q = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, BABYLON.Tools.ToRadians(180));
+              
+              var m = new BABYLON.Matrix();
+              q.toRotationMatrix(m);  
+              var v2 = BABYLON.Vector3.TransformCoordinates(this.moveVector, m);
+              this.moveFrames = 100;
+              this.moveVector = v2;
+
+            //this.setRandomMoveVector();
+          }
+        }
+
+
+        //this.hitbox.position.y += this.moveVector.y;
         if(this.moveFrames > 0) {
-          this.hitbox.position.x += this.moveVector.x;
-          this.hitbox.position.z += this.moveVector.z;
+          this.hitbox.position.x += this.moveVector.x * this.speed;
+          this.hitbox.position.z += this.moveVector.z * this.speed;
           this.moveFrames--;
         }
-        //this.hitbox.position.y += this.moveVector.y;
       }
+
+      
 
 
 

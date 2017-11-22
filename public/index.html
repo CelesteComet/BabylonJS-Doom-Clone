@@ -36,12 +36,21 @@
         .editor {
           float: left;
         }
+
+        #fpsLabel {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: #999;
+            cursor: default;
+        }
       </style>
 
    </head>
    <body>
     <canvas id="renderCanvas" touch-action="none"></canvas> 
     <div class='container'>
+    <div id='fpsLabel'></div>
       <canvas id='mapEditor' height="1000px" width="1000px"></canvas>
       <div class='editor'>
         <select id='mainSelect'> <!--Supplement an id here instead of using 'name'-->
@@ -51,6 +60,7 @@
         <button id='saveMap'>SAVE MAP</button>
       </div>
       <canvas id='mapper' height="100px" width="100px"></canvas>
+
     </div>
 
    </body>
