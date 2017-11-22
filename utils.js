@@ -34,6 +34,11 @@ const Utils = {
   },
   getDirectionBetweenTwoVectors: function(start, end) {
     return start.subtract(end).normalize();
+  },
+  getRadiansBetweenTwoVectors: function(origin, point) {
+    // Returns radian angle with respect to X-Z plane, useful to rotate an object to view a certain point
+    var signed_angle = Math.atan2(point.z - origin.z, point.x - origin.x);
+    return -signed_angle + Math.PI/2;
   }
 }
 

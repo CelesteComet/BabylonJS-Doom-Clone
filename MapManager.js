@@ -5,9 +5,19 @@ var bustomMesh = new BABYLON.Mesh("wall", scene);
 
 var MapManager = {
   list: {},
+  saved: [],
   init: function(assets) {
     this.materials = assets.materials;
     this.run();
+
+    if(localStorage.getItem('map')) {
+      this.saved = JSON.parse(window.localStorage.getItem('map'));
+      this.saved.forEach(function(wall) {
+        var a = wall[0];
+        var b = wall[1];
+        MapManager.createWall(new BABYLON.Vector3(a.x, a.y,a.z), new BABYLON.Vector3(b.x, b.y, b.z), 5);
+      })
+    }
 
     var ground = BABYLON.MeshBuilder.CreateGround("gd", {width: 500, height: 500, subdivsions: 1}, scene);
     ground.checkCollisions = true;
@@ -38,7 +48,9 @@ var MapManager = {
 
   },
   createWall: function(startVertex, endVertex, height) {
-
+    console.log('start', startVertex)
+    console.log('end', endVertex)
+    this.saved.push([startVertex, endVertex])
     // Clone custom mesh 
     var wallInstance = bustomMesh.clone('wall');
 
@@ -84,9 +96,11 @@ var MapManager = {
     wallInstance.material.diffuseTexture.vScale = 2;
     wallInstance.material.bumpTexture.uScale = length/4;
     wallInstance.material.bumpTexture.vScale = 2;
+    wallInstance.material.backFaceCulling = true;
 
     showNormals(wallInstance, 5, null, scene);
     this.list[wallInstance.id] = wallInstance;  
+
     return wallInstance;
   }
 
