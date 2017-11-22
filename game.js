@@ -51,7 +51,7 @@ var game = {
     
     
 
-    var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
+    //var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
 
       
     var tick = 0;
