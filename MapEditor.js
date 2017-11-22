@@ -46,6 +46,11 @@ const MapEditor = {
       window.localStorage.setItem('map', JSON.stringify(MapManager.saved));
     })
 
+    var saveButton = document.getElementById('deleteMap');
+    saveButton.addEventListener('click', function() {
+      window.localStorage.removeItem('map');
+    })
+
 
 
     this.canvas.addEventListener('mousedown', function(e) {

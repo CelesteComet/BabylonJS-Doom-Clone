@@ -28,7 +28,7 @@ var MonsterManager = {
       // Set monster game properties
       // -------------------------------------------------------------------------
       monsterInstance.health = 100;
-      monsterInstance.speed = 0.07;
+      monsterInstance.speed = 0.08;
       monsterInstance.moveVector = new BABYLON.Vector3(0,0,0);
       monsterInstance.moves = {
         up: new BABYLON.Vector3(0, 0, 1),
@@ -41,6 +41,8 @@ var MonsterManager = {
         downLeft: new BABYLON.Vector3(-1,0,-1)
       }
       monsterInstance.moveFrames = 0;
+      monsterInstance.wasStuck = false;
+      monsterInstance.stuck = false;
       // -------------------------------------------------------------------------
 
       // Set monster hitbox properties
@@ -148,7 +150,7 @@ var MonsterManager = {
       }
 
       monsterInstance.setRandomMoveVector = function() {
-        this.moveFrames = 10;
+        this.moveFrames = 50;
         var arr = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
         var rand = arr[Math.floor(Math.random() * arr.length)];
         this.moveVector = this.moves[rand];
@@ -160,7 +162,7 @@ var MonsterManager = {
       }
 
       monsterInstance.getHurt = function(pain) {
-        monsterInstance.pushBack(10);
+        monsterInstance.pushBack(100);
         this.inPain = true;
         this.health -= pain;
       }
@@ -173,15 +175,28 @@ var MonsterManager = {
       }
 
       monsterInstance.pushBack = function(frames) {
-        this.moveFrames = frames;
+        this.moveFrames = 10;
         this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize().scale(10);
       }
       // -------------------------------------------------------------------------
 
 
       monsterInstance.sprite.playAnimation(...monsterInstance.animations['walkForward']);
+      monsterInstance.hitbox.checkCollisions = true;
+      monsterInstance.hitbox.ellipsoid = new BABYLON.Vector3(1, monsterInstance.hitboxProps.height/2/2, 1);
+      monsterInstance.hitbox.onCollide = function(mesh) {
+        if(mesh.name == 'wall') {
+          monsterInstance.setRandomMoveVector();
+        }
+        if(mesh.name == 'imp') {
+        }
+            //console.log("COLLIDING WITH " + mesh.name)
+      }
 
       monsterInstance.update = function() {
+
+
+
         if(!this.dead && this.moveFrames <= 0) {
           this.setMoveVector();
         }
@@ -200,32 +215,11 @@ var MonsterManager = {
           this.inPain = false;
         }
 
-        
-
-
-        for(let id in MapManager.list) {
-          if(this.hitbox.intersectsMesh(MapManager.list[id], true) && MapManager.list[id].name == 'wall') {
-            /*
-            var arr = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
-            var rand = arr[Math.floor(Math.random() * arr.length)];
-            */
-            var q = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, BABYLON.Tools.ToRadians(180));
-              
-              var m = new BABYLON.Matrix();
-              q.toRotationMatrix(m);  
-              var v2 = BABYLON.Vector3.TransformCoordinates(this.moveVector, m);
-              this.moveFrames = 100;
-              this.moveVector = v2;
-
-            //this.setRandomMoveVector();
-          }
-        }
-
-
         //this.hitbox.position.y += this.moveVector.y;
         if(this.moveFrames > 0) {
-          this.hitbox.position.x += this.moveVector.x * this.speed;
-          this.hitbox.position.z += this.moveVector.z * this.speed;
+          this.hitbox.moveWithCollisions(this.moveVector.scale(0.06));
+          //this.hitbox.position.x += this.moveVector.x * this.speed;
+          //this.hitbox.position.z += this.moveVector.z * this.speed;
           this.moveFrames--;
         }
       }

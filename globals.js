@@ -22,7 +22,7 @@ scene.collisionsEnabled = true;
 var assetsManager = new BABYLON.AssetsManager(scene);
 
 // create the camera
-var camera = new BABYLON.UniversalCamera('camera1', new BABYLON.Vector3(0, 2, -2), scene);
+var camera = new BABYLON.UniversalCamera('camera1', new BABYLON.Vector3(5, 5, -5), scene);
 camera.applyGravity = false;
 camera.checkCollisions = true;
 camera.ellipsoid = new BABYLON.Vector3(0.1, 1.5, 0.2);

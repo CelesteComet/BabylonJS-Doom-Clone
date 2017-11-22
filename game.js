@@ -39,7 +39,7 @@ var game = {
 
     console.log("Adding a beautiful floor");
 
-    for(var i = 0; i < 10; i++) {
+    for(var i = 0; i < 4; i++) {
         let Imp = MonsterManager.create();
         var mvertex = new vertex(Math.random() * 50, Imp.hitboxProps.height/2, Math.random() * 50);
         Imp.hitbox.position = new BABYLON.Vector3(mvertex.x, Imp.hitboxProps.height/2, -mvertex.z);
@@ -51,14 +51,20 @@ var game = {
     
     
 
-    //var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
+    var music = new BABYLON.Sound("Music", "sounds/e2m1.mp3", scene, null, { loop: true, autoplay: true });
 
       
-
+    var tick = 0;
     console.log("Running the engine loop");
     var fpsLabel = document.getElementById("fpsLabel");
     engine.runRenderLoop(function(){
-
+      tick++;
+      if(tick % 100 == 0) {
+        let Imp = MonsterManager.create();
+        var mvertex = new vertex(Math.random() * 50, Imp.hitboxProps.height/2, Math.random() * 50);
+        Imp.hitbox.position = new BABYLON.Vector3(mvertex.x, Imp.hitboxProps.height/2, -mvertex.z);
+        Imp.sprite.position = Imp.hitbox.position;
+      }
       MapEditor.update();
       KeyboardManager.update();
       MonsterManager.update();

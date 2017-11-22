@@ -42,7 +42,7 @@ var MapManager = {
     ceiling.setPivotMatrix(BABYLON.Matrix.Translation(50/2, 0, 50/2));
     ceiling.id = Math.random()
 */
-    var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, -3), scene);
+    //var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, -3), scene);
   },
   run: function() {
 
@@ -94,11 +94,13 @@ var MapManager = {
     wallInstance.material = this.materials.e1m1wall.clone();
     wallInstance.material.diffuseTexture.uScale = length/4;
     wallInstance.material.diffuseTexture.vScale = 2;
-    wallInstance.material.bumpTexture.uScale = length/4;
-    wallInstance.material.bumpTexture.vScale = 2;
+    //wallInstance.material.bumpTexture.uScale = length/4;
+    //wallInstance.material.bumpTexture.vScale = 2;
     wallInstance.material.backFaceCulling = true;
 
-    showNormals(wallInstance, 5, null, scene);
+    wallInstance.checkCollisions = true;
+
+    //showNormals(wallInstance, 5, null, scene);
     this.list[wallInstance.id] = wallInstance;  
 
     return wallInstance;
