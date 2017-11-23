@@ -19,7 +19,7 @@ var MapManager = {
       })
     }
 
-    var ground = BABYLON.MeshBuilder.CreateGround("gd", {width: 500, height: 500, subdivsions: 1}, scene);
+    var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 500, height: 500, subdivsions: 1}, scene);
     ground.checkCollisions = true;
     ground.material = MapManager.materials.e1m1floor;
     ground.material.diffuseTexture.uScale = 500;
@@ -132,6 +132,15 @@ function showNormals(mesh, size, color, sc) {
   normalLines.color = color;
   return normalLines;
 }
+
+  var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:1000.0}, scene);
+  var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+  skyboxMaterial.backFaceCulling = false;
+  skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", scene);
+  skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+  skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+  skybox.material = skyboxMaterial; 
 
 
 

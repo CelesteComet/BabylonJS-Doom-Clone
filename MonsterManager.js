@@ -6,8 +6,39 @@ import opts from './options';
 import { MapManager } from './MapManager';
 import Utils from './utils';
 import SpriteManager from './SpriteManager';
+import ParticleManager from './ParticleManager';
 
 const { debug } = opts;
+
+var monsters = {
+  'cacodemon': {
+    'hitboxProps': {
+      height: 3,
+      width: 2,
+      depth: 2
+    },
+    'animations': {
+      'hurt': [0, 0, true, 300],
+      'dead': [0, 0, true, 300],
+      'down': [0, 0, true, 300]
+    },
+    'sounds': {
+      'hurt': Sounds[`hurt_${'cacodemon'}`],
+      'death': Sounds[`death_${'cacodemon'}`]
+    },
+    'blood': {
+
+    },
+    includeFlight: function(vector) {
+      if(Math.random() < 0.5) {
+        vector.y = 1;
+      } else {
+        vector.y = -1;
+      }
+      return vector;
+    }
+  }
+}
 
 var MonsterManager = {
   init: function(assets) {
@@ -16,7 +47,8 @@ var MonsterManager = {
   },
   run: function() {
     this.list = {};
-    this.create = function() {
+    this.create = function(name) {
+      var monsterType = monsters[name];
       console.log("Creating a monster")
     
       var monsterInstance = {};
@@ -41,17 +73,19 @@ var MonsterManager = {
         downLeft: new BABYLON.Vector3(-1,0,-1)
       }
       monsterInstance.moveFrames = 0;
-      monsterInstance.wasStuck = false;
-      monsterInstance.stuck = false;
+      monsterInstance.currentMoveAnimation = 'down';
       // -------------------------------------------------------------------------
 
       // Set monster hitbox properties
       // -------------------------------------------------------------------------
-      monsterInstance.hitboxProps = {
+      monsterInstance.hitboxProps = monsterType.hitboxProps;
+/*
+      {
         height: 3,
         depth: 1,
         width: 1
       }
+      */
       // -------------------------------------------------------------------------
 
       // Create monster hitbox
@@ -72,7 +106,7 @@ var MonsterManager = {
 
       // Create monster sprite
       // -------------------------------------------------------------------------
-      monsterInstance.sprite = new BABYLON.Sprite("impSprite", SpriteManager.Imp);
+      monsterInstance.sprite = new BABYLON.Sprite("cacodemonSprite", SpriteManager.Cacodemon);
       monsterInstance.sprite.size = 4;
       // Set sprite position 
       monsterInstance.sprite.position = monsterInstance.hitbox.position;
@@ -81,16 +115,45 @@ var MonsterManager = {
       // Set monster animations
       // -------------------------------------------------------------------------
       // Animation properties are an array that is spread to fit the sprite.animation arguments
+      // The playAnimation function is a wrapper to allow 0 to 0 frame animations 
+      monsterInstance.playAnimation = function(_from, to, bool, length, cb) {
+        if(cb || (_from !== to )) {
+          this.sprite.playAnimation(_from, to, bool, length, cb);
+        } else {
+          this.sprite.cellIndex = _from;
+          this.sprite.stopAnimation();
+        }
+
+      }
       monsterInstance.animations = {
+        'hurt': [9, 10, false, 150],
+        'dead': [10, 15, false, 200],
+        'down': [0, 0, true, 300],
+        'up': [4, 4, true, 300],
+        'upRight': [5, 5, true, 300],
+        'right': [6, 6, true, 300],
+        'downRight': [8, 8, true, 300],
+        'left': [7, 7, true, 300],
+        'upLeft': [3, 3, true, 300],
+        'downLeft': [1, 1, true, 300]
+      }
+
+    /*
+      {
         'walkForward': [0, 3, true, 300],
         'dead': [15, 19, false, 150],
         'hurt': [24, 25, false, 150]
       };
+*/
       
       
       // Monster can move, fire balls, can be in a state of pain... and die.
       // -------------------------------------------------------------------------
       monsterInstance.setMoveVector = function() {
+        if(Math.random() < 0.7) {
+          this.setRandomMoveVector();
+          return;
+        }
         // create a list of vectors
           var currentPosition = monsterInstance.hitbox.position.clone();
           // Up movement
@@ -145,7 +208,12 @@ var MonsterManager = {
 
           var direction = mapped[distanceKey];
           this.moveFrames = 50;
+          if(monsterType.includeFlight) {
+            this.moveVector = monsterType.includeFlight(this.moveVector);
+          }
+
           this.moveVector = this.moves[direction];
+          this.currentMoveAnimation = direction;
         // compare each vector to get distance 
       }
 
@@ -154,34 +222,46 @@ var MonsterManager = {
         var arr = ['up', 'down', 'left', 'right', 'upLeft', 'upRight', 'downLeft', 'downRight'];
         var rand = arr[Math.floor(Math.random() * arr.length)];
         this.moveVector = this.moves[rand];
-
+        this.currentMoveAnimation = rand;
+        if(monsterType.includeFlight) {
+          this.moveVector = monsterType.includeFlight(this.moveVector);
+        }
       }
 
       monsterInstance.fire = function() {
 
       }
 
-      monsterInstance.getHurt = function(pain) {
-        monsterInstance.pushBack(100);
+      monsterInstance.emitBloodAt = function(pos) {
+        // can accept a pos
+        var particleSystem = ParticleManager.emit('blueBlood', this.hitbox, 40);
+      }
+
+      monsterInstance.getHurt = function(pain, pushBack) {
+        monsterInstance.pushBack(pushBack);
         this.inPain = true;
         this.health -= pain;
       }
 
       monsterInstance.die = function() {
         this.dead = true;
-        this.sprite.playAnimation(...this.animations['dead']);
-        Math.random() < 0.5 ? Sounds.impDeath1.play(1) : Sounds.impDeath2.play(1);
-        this.hitbox.dispose();
+
+        this.playAnimation(...this.animations['dead']);
+        Math.random() < 0.5 ? monsterType.sounds.death.play(1) : monsterType.sounds.death.play(1);
+        //this.hitbox.dispose();
       }
 
       monsterInstance.pushBack = function(frames) {
-        this.moveFrames = 10;
+        this.moveFrames = frames;
         this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize().scale(10);
       }
       // -------------------------------------------------------------------------
 
+      monsterInstance.getAnimation = function(name) {
 
-      monsterInstance.sprite.playAnimation(...monsterInstance.animations['walkForward']);
+      }
+
+      //monsterInstance.playAnimation(...monsterInstance.animations['down']);
       monsterInstance.hitbox.checkCollisions = true;
       monsterInstance.hitbox.ellipsoid = new BABYLON.Vector3(1, monsterInstance.hitboxProps.height/2/2, 1);
       monsterInstance.hitbox.onCollide = function(mesh) {
@@ -194,32 +274,50 @@ var MonsterManager = {
       }
 
       monsterInstance.update = function() {
+        //console.log(Utils.getRadiansBetweenTwoVectors(this.hitbox.position, camera.position) * 180/Math.PI);
+        // Set sprite position to that of hitbox
+        monsterInstance.sprite.position = monsterInstance.hitbox.position;
 
+        // Set animation
 
-
-        if(!this.dead && this.moveFrames <= 0) {
-          this.setMoveVector();
-        }
+        
 
         if(this.health < 0 && !this.dead) {
           this.die();
           return;
         }
 
+        if(this.dead) {
+          monsterInstance.moveVector = new BABYLON.Vector3(0, -4, 0);
+          monsterInstance.moveFrames = 1000;
+          this.hitbox.onCollide = function(mesh) {
+            if(mesh.name == 'ground') {
+              monsterInstance.hitbox.dispose();
+            }
+          }
+        }
+
+        if(!this.dead && this.moveFrames <= 0) {
+          this.setMoveVector();
+          if(Math.abs( Utils.getRadiansBetweenTwoVectors(this.hitbox.position, camera.position) * 180/Math.PI) < 90) {
+            monsterInstance.playAnimation(...this.animations[Utils.flipDirection(this.currentMoveAnimation)]);
+          } else {
+            monsterInstance.playAnimation(...this.animations[this.currentMoveAnimation]);
+          }
+          
+        }
+
         if(this.inPain && !this.dead) {
-          Sounds.pain.attachToMesh(this.hitbox);
-          Sounds.pain.play(0.7);
-          this.sprite.playAnimation(...this.animations['hurt'], function() {
-            this.sprite.playAnimation(...this.animations['walkForward']);
+          monsterType.sounds.hurt.attachToMesh(this.hitbox);
+          monsterType.sounds.hurt.play(0.7);
+          this.playAnimation(...this.animations['hurt'], function() {
+            this.playAnimation(...this.animations['down']);
           }.bind(this));
           this.inPain = false;
         }
 
-        //this.hitbox.position.y += this.moveVector.y;
         if(this.moveFrames > 0) {
           this.hitbox.moveWithCollisions(this.moveVector.scale(0.06));
-          //this.hitbox.position.x += this.moveVector.x * this.speed;
-          //this.hitbox.position.z += this.moveVector.z * this.speed;
           this.moveFrames--;
         }
       }

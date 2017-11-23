@@ -13,7 +13,9 @@ const soundFileNames = {
   'fireball': 'fireball.wav',
   'chaingun': 'chaingun.wav',
   'd_e2m1': 'd_e2m1.mid',
-  'sun': 'sun.mp3'
+  'sun': 'sun.mp3',
+  'hurt_cacodemon': 'hurt_cacodemon.wav',
+  'death_cacodemon': 'death_cacodemon.wav'
 }
 
 for(let name in soundFileNames) {

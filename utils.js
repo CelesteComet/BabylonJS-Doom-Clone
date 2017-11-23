@@ -39,6 +39,19 @@ const Utils = {
     // Returns radian angle with respect to X-Z plane, useful to rotate an object to view a certain point
     var signed_angle = Math.atan2(point.z - origin.z, point.x - origin.x);
     return -signed_angle + Math.PI/2;
+  },
+  flipDirection: function(d) {
+    var o = {
+      up: 'down',
+      down: 'up',
+      left: 'right',
+      right: 'left',
+      upRight: 'downLeft',
+      upLeft: 'downRight',
+      downRight: 'upLeft',
+      downLeft: 'upRight'
+    }
+    return o[d];
   }
 }
 

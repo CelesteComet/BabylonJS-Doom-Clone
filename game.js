@@ -39,12 +39,12 @@ var game = {
 
     console.log("Adding a beautiful floor");
 
-    for(var i = 0; i < 4; i++) {
-        let Imp = MonsterManager.create();
+    for(var i = 0; i < 1; i++) {
+        let Imp = MonsterManager.create('cacodemon');
         var mvertex = new vertex(Math.random() * 50, Imp.hitboxProps.height/2, Math.random() * 50);
         Imp.hitbox.position = new BABYLON.Vector3(mvertex.x, Imp.hitboxProps.height/2, -mvertex.z);
 
-        Imp.sprite.position = Imp.hitbox.position;
+        //Imp.sprite.position = Imp.hitbox.position;
     }
 
     //var a = MapManager.createWall(new vertex(0, 0, 0), new vertex(10, 0, 0), 10);
@@ -60,10 +60,13 @@ var game = {
     engine.runRenderLoop(function(){
       tick++;
       if(tick % 100 == 0) {
-        let Imp = MonsterManager.create();
-        var mvertex = new vertex(Math.random() * 50, Imp.hitboxProps.height/2, Math.random() * 50);
-        Imp.hitbox.position = new BABYLON.Vector3(mvertex.x, Imp.hitboxProps.height/2, -mvertex.z);
-        Imp.sprite.position = Imp.hitbox.position;
+        if(options.hell) {
+          let Imp = MonsterManager.create('cacodemon');
+          var mvertex = new vertex(Math.random() * 50, Imp.hitboxProps.height/2, Math.random() * 50);
+          Imp.hitbox.position = new BABYLON.Vector3(mvertex.x, Imp.hitboxProps.height/2, -mvertex.z);
+          Imp.sprite.position = Imp.hitbox.position;
+        }
+
       }
       MapEditor.update();
       KeyboardManager.update();

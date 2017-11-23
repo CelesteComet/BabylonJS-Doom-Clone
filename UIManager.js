@@ -7,6 +7,16 @@ import * as BABYLON from 'babylonjs';
 import { scene, camera } from './globals';
 import ParticleManager from './ParticleManager';
 
+function createGunImage(gunName, sourceWidth, width, height, top) {
+  var image = new GUI.Image(gunName, `sprites/${gunName}.png`);
+  image.sourceWidth = sourceWidth;
+  image.width = width + '%';
+  image.height = height + '%';
+  image.top = top + '%';
+  image.isVisible = false;
+  return image;
+}
+
 var UIManager = {
   health: 10,
   healthContainer: new GUI.Rectangle(),
@@ -42,20 +52,10 @@ var UIManager = {
   },
   guns: {
     chaingun: {
-      image: new GUI.Image('chaingun', 'sprites/chaingun.png'),
-      sourceWidth: 114,
-      width: '20%',
-      height: '50%',
-      top: '20%',
-      moveTick: 0,
+      image: createGunImage('chaingun', 114, 20, 50, 20),
       init: function() {
-        var chainGunImage = this.image;
-        chainGunImage.sourceWidth = 114;
-        chainGunImage.width = '20%';
-        chainGunImage.height = '50%';
-        chainGunImage.top = '20%';
-        UIManager.GUI.addControl(chainGunImage);
-        chainGunImage.isVisible = false
+
+        UIManager.GUI.addControl(this.image);
         UIManager.currentGun = 'chaingun';
       },
       shoot: function() {
@@ -73,9 +73,9 @@ var UIManager = {
             var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
 
             decal.material = UIManager.materials.bulletHoleMaterial;
-            ParticleManager.emit('blood', pickInfo.pickedPoint);
 
-            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(1000);
+            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(10, 5);
+            MonsterManager.list[pickInfo.pickedMesh.id].emitBloodAt(pickInfo.pickedPoint);
           } else {
             ParticleManager.emit('bulletPuff', pickInfo.pickedPoint);
           }
@@ -100,7 +100,6 @@ var UIManager = {
         this.image.left = 300 * (0.1) * Math.sin(0.05 * this.moveTick);
       },
       stopMovingGun: function() {
-        
         var imageLeftInt = parseInt(this.image.left.match(/(.+)px/)[1])
         if(imageLeftInt > 0) {
           imageLeftInt -= 1;
@@ -112,7 +111,7 @@ var UIManager = {
         }
 
         var imageTopInt = parseInt(this.image.top.match(/(.+)%/)[1])
-        var originalTop = parseInt(this.top.match(/(.+)%/)[1])
+        var originalTop = parseInt(this.image.top.match(/(.+)%/)[1])
         if(imageTopInt > originalTop) {
           imageTopInt -= 1;
           this.image.top = imageTopInt + '%';
@@ -163,9 +162,9 @@ var UIManager = {
               decal.material = UIManager.materials.bulletHoleMaterial;
 
               if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
-                ParticleManager.emit('blood', pickInfo.pickedPoint, 100);
                 // find the monster in the list, play the death animation, then dispose
-                MonsterManager.list[pickInfo.pickedMesh.id].getHurt(15);
+                MonsterManager.list[pickInfo.pickedMesh.id].getHurt(15, 100);
+                MonsterManager.list[pickInfo.pickedMesh.id].emitBloodAt(pickInfo.pickedPoint);
                 //MonsterManager.list[pickInfo.pickedMesh.id].sprite.dispose();
               }
             }
@@ -269,26 +268,10 @@ var UIManager = {
   display: function(type) {
     var array;
 
-    if(type == 'health') {
-      this.healthContainer = new GUI.Rectangle();
-      array = this.health.toString().split('').map(function(e) {
-        return parseInt(e);
-      })
-    }
-
-    if(type == 'armor') {
-      this.armorContainer = new GUI.Rectangle();
-      array = this.armor.toString().split('').map(function(e) {
-        return parseInt(e);
-      })
-    }
-
-    if(type == 'ammo') {
-      this.ammoContainer = new GUI.Rectangle();
-      array = this.ammo.toString().split('').map(function(e) {
-        return parseInt(e);
-      })
-    }
+    this[type + 'Container'] = new GUI.Rectangle();
+    array = this[type].toString().split('').map(function(e) {
+      return parseInt(e);
+    });
 
     
     for(let i = 0; i < array.length; i++) {

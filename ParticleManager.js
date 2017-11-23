@@ -22,6 +22,21 @@ const ParticleManager = {
       direction1:  new BABYLON.Vector3(-7, 8, 3),
       direction2: new BABYLON.Vector3(7, 8, -3)
     },
+    blueBlood: {
+      amount: 1000,
+      particleTexture: new BABYLON.Texture("textures/flare.png", scene),
+      minSize: 0.1,
+      maxSize: 0.3,
+      emitRate: 6000,
+      targetStopDuration: 1,
+      maxEmitPower: 1,
+      color1: new BABYLON.Color4(0, 0, 1, 1),
+      color2: new BABYLON.Color4(0, 0, 1, 1),
+      gravity: new BABYLON.Vector3(0, -150.81, 0),
+      disposeOnStop: true,
+      direction1:  new BABYLON.Vector3(-7, 8, 3),
+      direction2: new BABYLON.Vector3(7, 8, -3)
+    },
     bulletPuff: {
       amount: 10,
       particleTexture: new BABYLON.Texture("textures/flare.png", scene),
@@ -63,6 +78,7 @@ const ParticleManager = {
     amount ? clonedParticleSystem._capacity = amount : 500
     clonedParticleSystem.emitter = emitter;
     clonedParticleSystem.start();
+    return clonedParticleSystem;
   }
 }
 

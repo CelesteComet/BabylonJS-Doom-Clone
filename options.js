@@ -1,8 +1,9 @@
 const opts = {
   verbose: false,
-  debug: true, 
+  debug: false, 
   showNormals: true,
-  showAxis: true
+  showAxis: true,
+  hell: true
 };
 
 export default opts;
