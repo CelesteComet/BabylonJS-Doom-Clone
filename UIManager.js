@@ -52,9 +52,10 @@ var UIManager = {
   },
   guns: {
     chaingun: {
-      image: createGunImage('chaingun', 114, 20, 50, 20),
+      attributes: ['chaingun', 114, 20, 50, 20],
+      moveTick: 0,
       init: function() {
-
+        this.image = createGunImage(...this.attributes);
         UIManager.GUI.addControl(this.image);
         UIManager.currentGun = 'chaingun';
       },
@@ -67,14 +68,13 @@ var UIManager = {
         this.moveTick = 0;
         if(UIManager.tick % 7 == 0) {
           var pickInfo = Utils.getCameraRayCastPickInfoWithOffset();
-
           if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
             var decalSize = new BABYLON.Vector3(0.1, 0.1, 0.1);
             var decal = BABYLON.MeshBuilder.CreateDecal("decal", pickInfo.pickedMesh, {position: pickInfo.pickedPoint, normal: pickInfo.getNormal(true), size: decalSize});
 
             decal.material = UIManager.materials.bulletHoleMaterial;
 
-            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(10, 5);
+            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(1000, 5);
             MonsterManager.list[pickInfo.pickedMesh.id].emitBloodAt(pickInfo.pickedPoint);
           } else {
             ParticleManager.emit('bulletPuff', pickInfo.pickedPoint);
@@ -96,10 +96,11 @@ var UIManager = {
       },
       moveGun: function() {
         this.moveTick++;
-        this.image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.3;
+        this.image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.2;
         this.image.left = 300 * (0.1) * Math.sin(0.05 * this.moveTick);
       },
       stopMovingGun: function() {
+        
         var imageLeftInt = parseInt(this.image.left.match(/(.+)px/)[1])
         if(imageLeftInt > 0) {
           imageLeftInt -= 1;

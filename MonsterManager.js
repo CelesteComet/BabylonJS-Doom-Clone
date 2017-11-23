@@ -17,6 +17,11 @@ var monsters = {
       width: 2,
       depth: 2
     },
+    'hitbox': BABYLON.MeshBuilder.CreateBox('imp', 
+        { height: 3,
+          width: 2,
+          depth: 2
+        }, scene),
     'animations': {
       'hurt': [0, 0, true, 300],
       'dead': [0, 0, true, 300],
@@ -40,9 +45,19 @@ var monsters = {
   }
 }
 
+// Hide the original meshes
+for (let name in monsters) {
+  monsters[name].hitbox.position.y -= 100 * Math.random();
+  monsters[name].hitbox.position.x += 100 * Math.random();
+}
+
+
+
 var MonsterManager = {
   init: function(assets) {
     this.materials = assets.materials;
+    monsters.cacodemon.hitbox.material = this.materials.wireFrame;
+    monsters.cacodemon.hitbox.alpha = + opts.debug;    
     this.run();
   },
   run: function() {
@@ -90,17 +105,21 @@ var MonsterManager = {
 
       // Create monster hitbox
       // -------------------------------------------------------------------------
+      monsterInstance.hitbox = monsterType.hitbox.createInstance();
+      monsterInstance.hitbox.name = 'imp'
+      /*
       const { height, depth, width } = monsterInstance.hitboxProps;
       monsterInstance.hitbox = BABYLON.MeshBuilder.CreateBox('imp', 
         { height,
           width,
           depth
         }, scene);
+      */
       // Give hitbox the same ID as the monster object
       monsterInstance.hitbox.id = monsterInstance.id;
       // Add material to monster hitbox
-      monsterInstance.hitbox.material = this.materials.wireFrame;
-      monsterInstance.hitbox.material.alpha = + opts.debug;
+      //monsterInstance.hitbox.material = this.materials.wireFrame;
+      //monsterInstance.hitbox.material.alpha = + opts.debug;
       // -------------------------------------------------------------------------
 
 
