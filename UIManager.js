@@ -74,7 +74,7 @@ var UIManager = {
 
             decal.material = UIManager.materials.bulletHoleMaterial;
 
-            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(1000, 5);
+            MonsterManager.list[pickInfo.pickedMesh.id].getHurt(10, 1);
             MonsterManager.list[pickInfo.pickedMesh.id].emitBloodAt(pickInfo.pickedPoint);
           } else {
             ParticleManager.emit('bulletPuff', pickInfo.pickedPoint);
@@ -89,6 +89,7 @@ var UIManager = {
           UIManager.index = 0;
         }
         UIManager.guns[UIManager.currentGun].image.sourceLeft = arr[UIManager.index]
+        UIManager.guns[UIManager.currentGun].image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.2;
       },
       stopShooting: function() {
         var arr = [0, 114, 228];
@@ -96,7 +97,7 @@ var UIManager = {
       },
       moveGun: function() {
         this.moveTick++;
-        this.image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.2;
+        this.image.top = (0.05) * Math.sin(2 * (0.05 * this.moveTick)) + 0.2;;
         this.image.left = 300 * (0.1) * Math.sin(0.05 * this.moveTick);
       },
       stopMovingGun: function() {
@@ -164,7 +165,7 @@ var UIManager = {
 
               if(pickInfo && pickInfo.pickedMesh && pickInfo.pickedMesh.name == 'imp') {
                 // find the monster in the list, play the death animation, then dispose
-                MonsterManager.list[pickInfo.pickedMesh.id].getHurt(15, 100);
+                MonsterManager.list[pickInfo.pickedMesh.id].getHurt(15, 10);
                 MonsterManager.list[pickInfo.pickedMesh.id].emitBloodAt(pickInfo.pickedPoint);
                 //MonsterManager.list[pickInfo.pickedMesh.id].sprite.dispose();
               }

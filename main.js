@@ -41,7 +41,7 @@ for(let textureName in textures) {
     if(loadedTextures == numberOfTextures) {
       assets.materials.bulletHoleMaterial.diffuseTexture.hasAlpha = true; 
       assets.materials.bulletHoleMaterial.zOffset = -2;
-      assets.materials.wireFrame.wireframe = true;
+      assets.materials.wireFrame.wireframe = false;
       // Shotgun Material
       assets.materials.shotgunMaterial = new BABYLON.StandardMaterial(name, scene);
       var shotgunTexture = new BABYLON.Texture("sprites/shotgun.png", scene);

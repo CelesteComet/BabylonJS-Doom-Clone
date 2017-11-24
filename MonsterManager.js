@@ -56,8 +56,8 @@ for (let name in monsters) {
 var MonsterManager = {
   init: function(assets) {
     this.materials = assets.materials;
-    monsters.cacodemon.hitbox.material = this.materials.wireFrame;
-    monsters.cacodemon.hitbox.alpha = + opts.debug;    
+    monsters.cacodemon.hitbox.material = new BABYLON.StandardMaterial('asd', scene);//this.materials.wireFrame;
+    monsters.cacodemon.hitbox.material.alpha = 0//+ opts.debug;    
     this.run();
   },
   run: function() {
@@ -145,7 +145,7 @@ var MonsterManager = {
 
       }
       monsterInstance.animations = {
-        'hurt': [9, 10, false, 150],
+        'hurt': [9, 10, true, 300],
         'dead': [10, 15, false, 200],
         'down': [0, 0, true, 300],
         'up': [4, 4, true, 300],
@@ -259,6 +259,7 @@ var MonsterManager = {
       monsterInstance.getHurt = function(pain, pushBack) {
         monsterInstance.pushBack(pushBack);
         this.inPain = true;
+        this.painStarted = true;
         this.health -= pain;
       }
 
@@ -270,9 +271,8 @@ var MonsterManager = {
         //this.hitbox.dispose();
       }
 
-      monsterInstance.pushBack = function(frames) {
-        this.moveFrames = frames;
-        this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize().scale(10);
+      monsterInstance.pushBack = function(power) {
+        this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize().scale(power);
       }
       // -------------------------------------------------------------------------
 
@@ -293,13 +293,16 @@ var MonsterManager = {
       }
 
       monsterInstance.update = function() {
-        //console.log(Utils.getRadiansBetweenTwoVectors(this.hitbox.position, camera.position) * 180/Math.PI);
         // Set sprite position to that of hitbox
         monsterInstance.sprite.position = monsterInstance.hitbox.position;
-
         // Set animation
+        if(!this.inPain && !this.dead) {
+          var degs = Utils.getDegreesBetweenTwoVectors(this.hitbox.position, camera.position);
+          var relativePosition = Utils.getRelativePosition(degs)
+          var monsterDirection = Utils.flipDirection(this.currentMoveAnimation, relativePosition);
+          this.playAnimation(...this.animations[monsterDirection]);
+        }
 
-        
 
         if(this.health < 0 && !this.dead) {
           this.die();
@@ -316,26 +319,27 @@ var MonsterManager = {
           }
         }
 
-        if(!this.dead && this.moveFrames <= 0) {
-          this.setMoveVector();
-          if(Math.abs( Utils.getRadiansBetweenTwoVectors(this.hitbox.position, camera.position) * 180/Math.PI) < 90) {
-            monsterInstance.playAnimation(...this.animations[Utils.flipDirection(this.currentMoveAnimation)]);
-          } else {
-            monsterInstance.playAnimation(...this.animations[this.currentMoveAnimation]);
-          }
-          
-        }
 
-        if(this.inPain && !this.dead) {
+
+        if(this.painStarted && this.inPain && !this.dead) {
           monsterType.sounds.hurt.attachToMesh(this.hitbox);
           monsterType.sounds.hurt.play(0.7);
-          this.playAnimation(...this.animations['hurt'], function() {
-            this.playAnimation(...this.animations['down']);
+          this.sprite.playAnimation(9, 10, false, 300, function() {
+            this.inPain = false;
           }.bind(this));
-          this.inPain = false;
+          this.painStarted = false;
+          /*
+          this.playAnimation(...this.animations['hurt'], function() {
+            this.inPain = false;
+          }.bind(this));
+          */
         }
 
-        if(this.moveFrames > 0) {
+        if(!this.dead && this.moveFrames <= 0 && !this.inPain) {
+          this.setMoveVector();
+        }
+
+        if(this.moveFrames > 0 || this.inPain) {
           this.hitbox.moveWithCollisions(this.moveVector.scale(0.06));
           this.moveFrames--;
         }
