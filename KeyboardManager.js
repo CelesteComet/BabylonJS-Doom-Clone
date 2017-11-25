@@ -1,5 +1,6 @@
 import { camera } from './globals';
 import UIManager from './UIManager';
+import YOUIManager from './YOUIManager';
 
 // 61 plus key
 
@@ -40,10 +41,13 @@ const KeyboardManager = {
           this.keys['d'] = true;
           break;
         case 51: // 3
-          UIManager.bringOutCurrentGun("shotgun");
+          YOUIManager.switchGuns(3);
           break;
         case 52: // 4 
-          UIManager.bringOutCurrentGun("chaingun")
+          YOUIManager.switchGuns(4);
+          break;
+        case 53: // 5
+          YOUIManager.switchGuns(5);
           break;
         default: 
           break;
@@ -93,17 +97,19 @@ const KeyboardManager = {
   update: function() {
 
     if(this.keys.leftClick) {
+      YOUIManager.shooting = true;
       UIManager.shooting = true;
     } else {
       UIManager.shooting = false;
+      YOUIManager.shooting = false;
     }
 
     // Check each movement key to see if it is moving
     const { w, a, s, d } = this.keys;
     if(w || a || s || d) {
-      UIManager.moving = true;
+      YOUIManager.moving = true;
     } else {
-      UIManager.moving = false;
+      YOUIManager.moving = false;
     }
 
   }

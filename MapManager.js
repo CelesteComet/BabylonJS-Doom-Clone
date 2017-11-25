@@ -24,8 +24,8 @@ var MapManager = {
     ground.material = MapManager.materials.e1m1floor;
     ground.material.diffuseTexture.uScale = 500;
     ground.material.diffuseTexture.vScale = 500;
-    ground.material.bumpTexture.uScale = 500;
-    ground.material.bumpTexture.vScale = 500;
+    //ground.material.bumpTexture.uScale = 500;
+    //ground.material.bumpTexture.vScale = 500;
     ground.setPivotMatrix(BABYLON.Matrix.Translation(50/2, 0, 50/2));
     ground.id = Math.random()
     MapManager.list[ground.id] = ground;

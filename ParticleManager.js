@@ -35,7 +35,9 @@ const ParticleManager = {
       gravity: new BABYLON.Vector3(0, -150.81, 0),
       disposeOnStop: true,
       direction1:  new BABYLON.Vector3(-7, 8, 3),
-      direction2: new BABYLON.Vector3(7, 8, -3)
+      direction2: new BABYLON.Vector3(7, 8, -3),
+      minLifeTime: 0.3,
+      maxLifeTime: 1
     },
     bulletPuff: {
       amount: 10,
@@ -50,7 +52,26 @@ const ParticleManager = {
       gravity: new BABYLON.Vector3(0, 0, 0),
       disposeOnStop: true,
       direction1:  new BABYLON.Vector3(0.5, 0.5, 0.5),
-      direction2: new BABYLON.Vector3(-0.5, 0.5, -0.5)
+      direction2: new BABYLON.Vector3(-0.5, 0.5, -0.5),
+      minLifeTime: 0.3,
+      maxLifeTime: 1
+    },
+    rocketTrail: {
+      amount: 5000,
+      particleTexture: new BABYLON.Texture("textures/flare.png", scene),
+      minSize: 0.4,
+      maxSize: 0.5,
+      emitRate: 500,
+      targetStopDuration: 100,
+      maxEmitPower: 10,
+      color1: new BABYLON.Color4(1, 0, 0, 1),
+      color2: new BABYLON.Color4(0.5, 0, 0, 1),
+      gravity: new BABYLON.Vector3(0, 0, 0),
+      disposeOnStop: false,
+      direction1:  new BABYLON.Vector3(0, 0, 0),
+      direction2: new BABYLON.Vector3(0, 0, 0),
+      minLifeTime: 0.3,
+      maxLifeTime: 1
     }
   },
   run: function() {
@@ -71,6 +92,9 @@ const ParticleManager = {
       this[effectName].disposeOnStop = props.disposeOnStop;
       this[effectName].direction1 = props.direction1;
       this[effectName].direction2 = props.direction2;
+      this[effectName].minLifeTime = props.minLifeTime;
+      this[effectName].maxLifeTime = props.maxLifeTime;
+
     }
   },
   emit: function(type, emitter, amount) {

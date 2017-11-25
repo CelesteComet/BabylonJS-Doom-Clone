@@ -10,6 +10,52 @@ import ParticleManager from './ParticleManager';
 
 const { debug } = opts;
 
+var impHitbox = BABYLON.MeshBuilder.CreateBox('imp', 
+                { height: 3,
+                  width: 2,
+                  depth: 2
+                }, scene)
+
+function Minster() {
+  
+}
+
+function Imp() 
+{ 
+
+  // private variables
+  const sounds = {
+    'hurt': Sounds['hurt_imp'],
+    'death1': Sounds['impDeath1'],
+    'death2': Sounds['impDeath2']
+  }
+
+  const animations = {
+    'walkForward': [0, 3, true, 300],
+    'dead': [15, 19, false, 150],
+    'hurt': [24, 25, false, 150]
+  }
+
+  // public variables
+  this.id = Math.random();
+  this.moveVector;
+  this.hitbox = impHitbox.createInstance();
+
+
+
+  this.selectMoveVector = function()
+  {
+
+  }
+
+  this.update = function() 
+  {
+
+  }
+}
+
+Imp.prototype = Minster;
+
 var monsters = {
   'cacodemon': {
     'hitboxProps': {
@@ -169,6 +215,7 @@ var MonsterManager = {
       // Monster can move, fire balls, can be in a state of pain... and die.
       // -------------------------------------------------------------------------
       monsterInstance.setMoveVector = function() {
+        var t0 = performance.now();
         if(Math.random() < 0.7) {
           this.setRandomMoveVector();
           return;
@@ -233,6 +280,8 @@ var MonsterManager = {
 
           this.moveVector = this.moves[direction];
           this.currentMoveAnimation = direction;
+          var t1 = performance.now();
+console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.")
         // compare each vector to get distance 
       }
 
@@ -256,8 +305,8 @@ var MonsterManager = {
         var particleSystem = ParticleManager.emit('blueBlood', this.hitbox, 40);
       }
 
-      monsterInstance.getHurt = function(pain, pushBack) {
-        monsterInstance.pushBack(pushBack);
+      monsterInstance.getHurt = function(pain, pushBack, pushedFrom) {
+        monsterInstance.pushBack(pushBack, pushedFrom);
         this.inPain = true;
         this.painStarted = true;
         this.health -= pain;
@@ -271,8 +320,9 @@ var MonsterManager = {
         //this.hitbox.dispose();
       }
 
-      monsterInstance.pushBack = function(power) {
-        this.moveVector = this.hitbox.position.subtract(camera.globalPosition).normalize().scale(power);
+      monsterInstance.pushBack = function(power, pushedFrom) {
+        if(!pushedFrom) { var pushedFrom = camera.globalPosition }
+        this.moveVector = this.hitbox.position.subtract(pushedFrom).normalize().scale(power);
       }
       // -------------------------------------------------------------------------
 
@@ -318,8 +368,6 @@ var MonsterManager = {
             }
           }
         }
-
-
 
         if(this.painStarted && this.inPain && !this.dead) {
           monsterType.sounds.hurt.attachToMesh(this.hitbox);

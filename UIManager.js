@@ -57,7 +57,6 @@ var UIManager = {
       init: function() {
         this.image = createGunImage(...this.attributes);
         UIManager.GUI.addControl(this.image);
-        UIManager.currentGun = 'chaingun';
       },
       shoot: function() {
 

@@ -15,7 +15,8 @@ const soundFileNames = {
   'd_e2m1': 'd_e2m1.mid',
   'sun': 'sun.mp3',
   'hurt_cacodemon': 'hurt_cacodemon.wav',
-  'death_cacodemon': 'death_cacodemon.wav'
+  'death_cacodemon': 'death_cacodemon.wav',
+  'shoot_rocketlauncher': 'shoot_rocketlauncher.wav'
 }
 
 for(let name in soundFileNames) {

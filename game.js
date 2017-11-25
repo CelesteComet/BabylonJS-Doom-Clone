@@ -10,11 +10,15 @@ import MapEditor from './MapEditor';
 import UIManager from './UIManager';
 import KeyboardManager from './KeyboardManager';
 import ParticleManager from './ParticleManager';
+import DecalManager from './DecalManager';
 
 
 import { MapManager } from './MapManager';
 import { vertex } from './MapManager';
-console.log(vertex)
+import YOUIManager from './YOUIManager';
+
+console.log(YOUIManager);
+
 var game = {
   init: function(assets) {
     console.log("Initializing the game");
@@ -25,10 +29,13 @@ var game = {
     var Materials = assets.materials;
 
     console.log("Initializing Monster Manager");
+    DecalManager.init(assets);
     ParticleManager.init(assets);
     MonsterManager.init(assets);
     MapManager.init(assets);
-    UIManager.init(assets);
+
+    //UIManager.init(assets);
+    YOUIManager.init(assets);
     MapEditor.init();
     KeyboardManager.init();
 
@@ -66,15 +73,16 @@ var game = {
           Imp.hitbox.position = new BABYLON.Vector3(0, Imp.hitboxProps.height/2, -mvertex.z);
           Imp.sprite.position = Imp.hitbox.position;
         }
-
+        tick = 0;
       }
       MapEditor.update();
       KeyboardManager.update();
       MonsterManager.update();
-      ProjectileManager.update();
-      UIManager.update();
+      //UIManager.update();
+      YOUIManager.update();
       cambox.position = camera.position;
       cambox.rotation = camera.rotation;
+      ProjectileManager.update();
       scene.render();
       
     fpsLabel.innerHTML = engine.getFps().toFixed() + " fps";
