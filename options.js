@@ -3,7 +3,7 @@ const opts = {
   debug: false, 
   showNormals: true,
   showAxis: true,
-  hell: false 
+  hell: true 
 };
 
 export default opts;

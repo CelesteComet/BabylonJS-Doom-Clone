@@ -33,6 +33,9 @@ function Explosion(position) {
   explosion.position = position;
   explosion.computeWorldMatrix();
       sprite.position = explosion.position;
+      var sound = Sounds.explode_rocketlauncher;
+      sound.attachToMesh(explosion);
+      sound.play(1);
       sprite.playAnimation(0,2, false, 400, function() {
         sprite.dispose();
       }.bind(this))

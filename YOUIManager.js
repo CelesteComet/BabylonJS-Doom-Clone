@@ -246,7 +246,7 @@ function RocketLauncher()
   // public variables
   this.gunImage = createGunImage('rocketlauncher', 120, 30, 70, 20);
   this.originalTop = '20%';
-  this.fireRate = 3;
+  this.fireRate = 7;
   this.pallets = 1;
   this.animationFrames = animationFrames;
   this.ammo = 999;
